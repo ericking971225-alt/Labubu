@@ -19,7 +19,7 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 70px; }
-    header { background: var(--card); padding: 16px; text-align: center; font-weight: bold; font-size: 1.2rem; border-bottom: 1px solid var(--border); sticky: top: 0; z-index: 10; }
+    header { background: var(--card); padding: 16px; text-align: center; font-weight: bold; font-size: 1.2rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
     .container { max-width: 600px; margin: 0 auto; padding: 16px; }
     .card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 16px; }
     .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; background: #e0e7ff; color: #4338ca; margin-bottom: 12px; }
@@ -59,7 +59,7 @@
 
       <div id="api-warning" class="card">
         <h3>👋 歡迎使用學測自然刷題 App</h3>
-        <p style="margin-top: 8px; color: #64748b; font-size: 0.9rem;">請先點擊下方「設定」頁面，貼上你的 Google API Key 即可開始刷題！</p>
+        <p style="margin-top: 8px; color: #64748b; font-size: 0.9rem;">請點擊下方「設定」頁面，貼上你的 API Key（AQ. 開頭也可以）即可開始刷題！</p>
       </div>
     </div>
 
@@ -72,8 +72,8 @@
     <div id="tab-settings" class="hidden">
       <div class="card">
         <h3>API Key 設定</h3>
-        <p style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">貼上從 Google AI Studio 申請的免費金鑰：</p>
-        <input type="text" id="api-key-input" placeholder="貼上 AIzaSy... 開頭的金鑰">
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">貼上從 Google AI Studio 申請的金鑰：</p>
+        <input type="text" id="api-key-input" placeholder="貼上 API Key">
         <button class="btn-primary" onclick="saveApiKey()">儲存設定</button>
       </div>
     </div>
@@ -131,17 +131,17 @@
       document.getElementById('q-explanation').classList.add('hidden');
       document.getElementById('btn-next').classList.add('hidden');
 
-      const prompt = `你是一個台灣 108 課綱學測自然科命題專家。請出乙題符合學測難度的單選題（隨機挑選：物理、化學、生物、地科）。請嚴格遵守回傳 JSON 格式如下，不要加上 markdown 語法或其餘字元：
+      const prompt = `你是一個台灣 108 課綱學測自然科命題專家。請出一題符合學測難度的單選題（隨機挑選：物理、化學、生物、地科）。請嚴格遵守回傳 JSON 格式如下，不要加上任何其餘文字：
       {
         "subject": "科目名稱",
         "question": "題目內文",
         "options": {"A": "選項A", "B": "選項B", "C": "選項C", "D": "選項D"},
-        "answer": "正確答案字母(A/B/C/D)",
+        "answer": "A",
         "explanation": "觀念詳細解析"
       }`;
 
       try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -149,13 +149,23 @@
             generationConfig: { response_mime_type: "application/json" }
           })
         });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error?.message || 'API 請求失敗');
+        }
+
         const data = await res.json();
-        const textResult = data.candidates[0].content.parts[0].text;
+        let textResult = data.candidates[0].content.parts[0].text;
+        
+        // 自動過濾掉可能的 markdown 標籤
+        textResult = textResult.replace(/```json/g, '').replace(/```/g, '').trim();
         currentQuestion = JSON.parse(textResult);
 
         displayQuestion(currentQuestion);
       } catch (err) {
-        alert('出題失敗，請檢查 API Key 是否正確或網路連線。');
+        console.error(err);
+        alert('出題失敗：' + err.message + '\n請重新整理頁面或檢查 API Key。');
       } finally {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('quiz-card').classList.remove('hidden');
@@ -180,7 +190,7 @@
 
     function checkAnswer(selected, selectedBtn) {
       const allBtns = document.querySelectorAll('.btn-option');
-      allBtns.forEach(btn => btn.onclick = null); // 鎖定點擊
+      allBtns.forEach(btn => btn.onclick = null);
 
       const isCorrect = selected === currentQuestion.answer;
       
@@ -188,12 +198,10 @@
         selectedBtn.classList.add('correct');
       } else {
         selectedBtn.classList.add('wrong');
-        // 自動加入錯題本
         mistakes.push({ ...currentQuestion, date: new Date().toLocaleDateString() });
         localStorage.setItem('mistakes_db', JSON.stringify(mistakes));
         updateMistakeCount();
 
-        // 標示出正確答案
         allBtns.forEach(btn => {
           if (btn.innerText.startsWith(currentQuestion.answer)) {
             btn.classList.add('correct');
@@ -201,7 +209,6 @@
         });
       }
 
-      // 顯示解析與下一題按鈕
       const expBox = document.getElementById('q-explanation');
       expBox.innerHTML = `<strong>解析：</strong><br>${currentQuestion.explanation}`;
       expBox.classList.remove('hidden');
