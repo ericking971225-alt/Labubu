@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="拉布學測自然練習祕笈">
-  <title>拉布學測自然練習祕笈</title>
+  <meta name="apple-mobile-web-app-title" content="拉布">
+  <title>拉布自然祕笈</title>
   <style>
     :root {
       --primary: #6366f1;
@@ -21,14 +21,13 @@
       --wrong: #ef4444;
       --wrong-bg: #fee2e2;
       
-      /* 科目色彩 */
       --physics: #0284c7;
       --chemistry: #8b5cf6;
       --biology: #059669;
       --earth: #d97706;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
 
     body {
       background: var(--bg-gradient);
@@ -38,7 +37,6 @@
       padding-bottom: 90px;
     }
 
-    /* 頂部 Header */
     header {
       background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(16px);
@@ -59,9 +57,6 @@
       background: var(--primary-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .streak-badge {
@@ -72,10 +67,8 @@
       font-size: 0.85rem;
       font-weight: 700;
       box-shadow: 0 2px 4px rgba(245, 158, 11, 0.15);
-      animation: pulse 2s infinite;
     }
 
-    /* 容器與卡片 */
     .container { max-width: 500px; margin: 0 auto; padding: 16px; }
 
     .card {
@@ -85,12 +78,10 @@
       padding: 24px;
       border-radius: 24px;
       border: 1px solid var(--card-border);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
       margin-bottom: 20px;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    /* 科目 Badge */
     .subject-badge {
       display: inline-flex;
       align-items: center;
@@ -101,7 +92,6 @@
       font-weight: 800;
       color: white;
       margin-bottom: 14px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .bg-physics { background: var(--physics); }
     .bg-chemistry { background: var(--chemistry); }
@@ -113,11 +103,9 @@
       font-size: 1.1rem;
       line-height: 1.65;
       font-weight: 600;
-      color: var(--text-main);
       margin-bottom: 20px;
     }
 
-    /* 選項按鈕 */
     .options { display: flex; flex-direction: column; gap: 12px; }
 
     .btn-option {
@@ -128,33 +116,13 @@
       text-align: left;
       font-size: 1rem;
       font-weight: 500;
-      color: var(--text-main);
       cursor: pointer;
       transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
 
-    .btn-option:active { transform: scale(0.98); }
+    .btn-option.correct { background: var(--correct-bg); border-color: var(--correct); color: #065f46; font-weight: 700; }
+    .btn-option.wrong { background: var(--wrong-bg); border-color: var(--wrong); color: #991b1b; font-weight: 700; }
 
-    .btn-option.correct {
-      background: var(--correct-bg);
-      border-color: var(--correct);
-      color: #065f46;
-      font-weight: 700;
-    }
-
-    .btn-option.wrong {
-      background: var(--wrong-bg);
-      border-color: var(--wrong);
-      color: #991b1b;
-      font-weight: 700;
-      animation: shake 0.4s ease;
-    }
-
-    /* 觀念解析 */
     .explanation {
       margin-top: 20px;
       padding: 16px;
@@ -163,11 +131,8 @@
       border-radius: 12px;
       font-size: 0.95rem;
       line-height: 1.6;
-      color: #334155;
-      animation: fadeIn 0.3s ease;
     }
 
-    /* 功能按鈕 */
     .btn-action {
       width: 100%;
       background: var(--primary-gradient);
@@ -179,17 +144,9 @@
       font-weight: 700;
       cursor: pointer;
       margin-top: 16px;
-      box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.4);
-      transition: all 0.2s;
     }
 
-    .btn-action:active { transform: scale(0.97); }
-
-    /* 載入動畫 */
-    .loader-box {
-      text-align: center;
-      padding: 40px 20px;
-    }
+    .loader-box { text-align: center; padding: 40px 20px; }
     .spinner {
       width: 48px;
       height: 48px;
@@ -200,12 +157,9 @@
       margin: 0 auto 16px auto;
     }
 
-    /* 底部導覽列 */
     .nav-bar {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -216,45 +170,19 @@
     }
 
     .nav-item {
-      flex: 1;
-      text-align: center;
-      padding: 12px 0 8px 0;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: color 0.2s;
+      flex: 1; text-align: center; padding: 12px 0 8px 0;
+      font-size: 0.75rem; font-weight: 600; color: var(--text-muted); cursor: pointer;
     }
-
     .nav-item .icon { font-size: 1.4rem; display: block; margin-bottom: 2px; }
     .nav-item.active { color: var(--primary); }
 
-    /* 輸入框 */
     input[type="text"] {
-      width: 100%;
-      padding: 14px;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      margin-top: 10px;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s;
+      width: 100%; padding: 14px; border: 2px solid #e2e8f0;
+      border-radius: 12px; margin-top: 10px; font-size: 1rem; outline: none;
     }
-    input[type="text"]:focus { border-color: var(--primary); }
 
     .hidden { display: none !important; }
-
-    /* 動畫 Keyframes */
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-6px); }
-      40%, 80% { transform: translateX(6px); }
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* 靜態紙花 Canvas */
     #confetti-canvas { position: fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:999; }
   </style>
 </head>
@@ -263,20 +191,18 @@
   <canvas id="confetti-canvas"></canvas>
 
   <header>
-    <div class="app-title">拉布學測自然練習祕笈</div>
+    <div class="app-title">拉布自然祕笈</div>
     <div class="streak-badge" id="streak-count">🔥 連勝: 0</div>
   </header>
 
   <div class="container">
-    <!-- 1. 刷題分頁 -->
     <div id="tab-quiz">
       <div id="loading" class="card loader-box hidden">
         <div class="spinner"></div>
-        <p style="font-weight: 700; color: var(--primary);">AI 正在精準分析 108 課綱題目...</p>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">為你打造學測高頻考點</p>
+        <p style="font-weight: 700; color: var(--primary);" id="loading-text">正在自動配對最佳 AI 模型...</p>
       </div>
 
-      <div id="quiz-card" class="card hidden" style="animation: fadeIn 0.4s ease;">
+      <div id="quiz-card" class="card hidden">
         <div id="q-badge" class="subject-badge bg-default">💡 自然科</div>
         <div class="question-text" id="q-text">題目載入中...</div>
         <div class="options" id="q-options"></div>
@@ -285,28 +211,24 @@
       </div>
 
       <div id="api-warning" class="card">
-        <h3 style="font-size: 1.2rem; margin-bottom: 8px;">✨ 歡迎開啟刷題之旅</h3>
-        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">請先點擊下方 <b>「⚙️ 設定」</b> 頁面，貼上你的 Google API Key，即可享受每日極速抽題與自動錯題管理！</p>
+        <h3 style="font-size: 1.2rem; margin-bottom: 8px;">✨ 歡迎開啟學測自然刷題之旅</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">請點擊下方 <b>「⚙️ 設定」</b> 貼上你的 API Key 即可自動開啟出題！</p>
       </div>
     </div>
 
-    <!-- 2. 錯題本分頁 -->
     <div id="tab-mistakes" class="hidden">
       <div id="mistakes-list"></div>
     </div>
 
-    <!-- 3. 設定分頁 -->
     <div id="tab-settings" class="hidden">
       <div class="card">
         <h3 style="font-size: 1.1rem; margin-bottom: 6px;">🔑 Google API Key 設定</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted);">貼上你在 Google AI Studio 申請的金鑰：</p>
-        <input type="text" id="api-key-input" placeholder="貼上 API Key (例如 AIzaSy... 或 AQ...)">
-        <button class="btn-action" onclick="saveApiKey()">儲存設定</button>
+        <input type="text" id="api-key-input" placeholder="貼上 API Key">
+        <button class="btn-action" onclick="saveApiKey()">儲存設定並自動配對</button>
       </div>
     </div>
   </div>
 
-  <!-- 底部導覽列 -->
   <div class="nav-bar">
     <div class="nav-item active" onclick="switchTab('quiz')">
       <span class="icon">📝</span>每日刷題
@@ -321,6 +243,7 @@
 
   <script>
     let apiKey = localStorage.getItem('gemini_api_key') || '';
+    let selectedModel = localStorage.getItem('gemini_selected_model') || '';
     let currentQuestion = null;
     let mistakes = JSON.parse(localStorage.getItem('mistakes_db') || '[]');
     let streak = 0;
@@ -334,12 +257,44 @@
       }
     };
 
-    function saveApiKey() {
+    // 自動偵測該 Key 支援的 Google AI 模型名稱
+    async function autoDetectModel() {
+      if (!apiKey) return null;
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+        if (!res.ok) throw new Error('API Key 連線失敗');
+        const data = await res.json();
+        if (!data.models || data.models.length === 0) throw new Error('沒有可用的模型');
+
+        // 優先挑選帶有 flash 且支援 generateContent 的模型
+        const flashModel = data.models.find(m => 
+          m.supportedGenerationMethods?.includes("generateContent") && m.name.includes("flash")
+        );
+        const anyModel = data.models.find(m => 
+          m.supportedGenerationMethods?.includes("generateContent")
+        );
+
+        const chosen = flashModel ? flashModel.name : (anyModel ? anyModel.name : null);
+        if (chosen) {
+          selectedModel = chosen; // 例如 "models/gemini-1.5-flash" 或 "models/gemini-2.0-flash"
+          localStorage.setItem('gemini_selected_model', selectedModel);
+          return selectedModel;
+        }
+      } catch (err) {
+        console.warn('模型自動偵測失敗:', err);
+      }
+      return null;
+    }
+
+    async function saveApiKey() {
       const key = document.getElementById('api-key-input').value.trim();
       if (key) {
         localStorage.setItem('gemini_api_key', key);
         apiKey = key;
-        alert('🎉 儲存成功！開始出題囉。');
+        localStorage.removeItem('gemini_selected_model');
+        selectedModel = '';
+        
+        document.getElementById('loading-text').innerText = '正在為你的 API Key 配對最佳模型...';
         document.getElementById('api-warning').classList.add('hidden');
         switchTab('quiz');
         fetchQuestion();
@@ -365,6 +320,15 @@
       document.getElementById('q-explanation').classList.add('hidden');
       document.getElementById('btn-next').classList.add('hidden');
 
+      // 如果尚未獲取過模型，自動向 Google 查詢可用模型
+      if (!selectedModel) {
+        document.getElementById('loading-text').innerText = '正在自動配對你帳號可用的 Gemini 模型...';
+        await autoDetectModel();
+      }
+
+      // 如果偵測出模型，使用偵測到的名稱；否則備用 models/gemini-1.5-flash
+      const modelPath = selectedModel || 'models/gemini-1.5-flash';
+
       const prompt = `你是一個台灣 108 課綱學測自然科命題專家。請出一題符合學測難度的單選題（隨機挑選：物理、化學、生物、地科）。請嚴格遵守回傳純 JSON 格式如下，不要加上任何 markdown 標記：
       {
         "subject": "物理", 
@@ -374,52 +338,38 @@
         "explanation": "詳細觀念解析"
       }`;
 
-      // 雙版本自動切換相容
-      const endpoints = [
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`
-      ];
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${modelPath}:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { response_mime_type: "application/json" }
+          })
+        });
 
-      let lastError = null;
-      let success = false;
-
-      for (const url of endpoints) {
-        try {
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { response_mime_type: "application/json" }
-            })
-          });
-
-          if (!res.ok) {
-            const errBody = await res.json();
-            throw new Error(errBody.error?.message || '請求失敗');
-          }
-
-          const data = await res.json();
-          let textResult = data.candidates[0].content.parts[0].text;
-          textResult = textResult.replace(/```json/gi, '').replace(/```/g, '').trim();
-          currentQuestion = JSON.parse(textResult);
-
-          displayQuestion(currentQuestion);
-          success = true;
-          break;
-        } catch (err) {
-          lastError = err;
+        if (!res.ok) {
+          // 若出錯則重置模型，下次重新偵測
+          localStorage.removeItem('gemini_selected_model');
+          selectedModel = '';
+          const errBody = await res.json();
+          throw new Error(errBody.error?.message || '請求失敗');
         }
-      }
 
-      document.getElementById('loading').classList.add('hidden');
+        const data = await res.json();
+        let textResult = data.candidates[0].content.parts[0].text;
+        textResult = textResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+        currentQuestion = JSON.parse(textResult);
 
-      if (success) {
+        displayQuestion(currentQuestion);
         document.getElementById('quiz-card').classList.remove('hidden');
-      } else {
-        alert('出題失敗：' + (lastError?.message || '未知錯誤') + '\n請先刪除舊 Key，並點選「+ Create project」重新生成一組 API Key！');
+      } catch (err) {
+        alert('出題失敗：' + err.message + '\n系統已重置備用設定，請再次重試！');
+      } finally {
+        document.getElementById('loading').classList.add('hidden');
       }
     }
+
     function displayQuestion(q) {
       const badge = document.getElementById('q-badge');
       badge.className = 'subject-badge ';
@@ -427,7 +377,7 @@
       if (q.subject.includes('物理')) { badge.classList.add('bg-physics'); badge.innerText = '⚛️ 物理'; }
       else if (q.subject.includes('化學')) { badge.classList.add('bg-chemistry'); badge.innerText = '🧪 化學'; }
       else if (q.subject.includes('生物')) { badge.classList.add('bg-biology'); badge.innerText = '🧬 生物'; }
-      else if (q.subject.includes('地') || q.subject.includes('地球')) { badge.classList.add('bg-earth'); badge.innerText = '🌍 地球科學'; }
+      else if (q.subject.includes('地')) { badge.classList.add('bg-earth'); badge.innerText = '🌍 地球科學'; }
       else { badge.classList.add('bg-default'); badge.innerText = '💡 ' + q.subject; }
 
       document.getElementById('q-text').innerText = q.question;
@@ -453,17 +403,14 @@
       if (isCorrect) {
         selectedBtn.classList.add('correct');
         streak++;
-        fireConfetti(); // 正解紙花特效
+        fireConfetti();
       } else {
         selectedBtn.classList.add('wrong');
         streak = 0;
-        
-        // 存入錯題本
         mistakes.push({ ...currentQuestion, date: new Date().toLocaleDateString() });
         localStorage.setItem('mistakes_db', JSON.stringify(mistakes));
         updateMistakeCount();
 
-        // 標示正確答案
         allBtns.forEach(btn => {
           if (btn.innerText.startsWith(currentQuestion.answer)) {
             btn.classList.add('correct');
@@ -472,8 +419,6 @@
       }
 
       document.getElementById('streak-count').innerText = `🔥 連勝: ${streak}`;
-
-      // 顯示解析
       const expBox = document.getElementById('q-explanation');
       expBox.innerHTML = `<strong>💡 觀念解析：</strong><br>${currentQuestion.explanation}`;
       expBox.classList.remove('hidden');
@@ -487,17 +432,17 @@
     function renderMistakes() {
       const container = document.getElementById('mistakes-list');
       if (mistakes.length === 0) {
-        container.innerHTML = `<div class="card" style="text-align:center; color:var(--text-muted);">🎉 尚無錯題紀錄，太厲害了！</div>`;
+        container.innerHTML = `<div class="card" style="text-align:center; color:var(--text-muted);">🎉 尚無錯題紀錄！</div>`;
         return;
       }
 
       container.innerHTML = mistakes.map((item, index) => `
-        <div class="card" style="animation: fadeIn 0.3s ease;">
+        <div class="card">
           <div class="subject-badge bg-default">📍 ${item.subject} (${item.date})</div>
           <div class="question-text">${item.question}</div>
           <div style="font-size:0.95rem; color:var(--correct); font-weight:700; margin-bottom:8px;">✅ 正確答案：${item.answer}. ${item.options[item.answer]}</div>
           <div class="explanation"><strong>觀念解析：</strong><br>${item.explanation}</div>
-          <button class="btn-action" style="background:#ef4444; margin-top:12px; box-shadow:none;" onclick="removeMistake(${index})">這題學會了（移出錯題本）</button>
+          <button class="btn-action" style="background:#ef4444; margin-top:12px;" onclick="removeMistake(${index})">移出錯題本</button>
         </div>
       `).join('');
     }
@@ -509,36 +454,28 @@
       renderMistakes();
     }
 
-    // 彩色紙花慶祝特效輕量實作
     function fireConfetti() {
       const canvas = document.getElementById('confetti-canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      const particles = Array.from({ length: 50 }, () => ({
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-        vx: (Math.random() - 0.5) * 12,
-        vy: (Math.random() - 0.7) * 12,
-        size: Math.random() * 8 + 4,
-        color: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'][Math.floor(Math.random() * 5)]
+      const particles = Array.from({ length: 40 }, () => ({
+        x: canvas.width / 2, y: canvas.height / 2,
+        vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.7) * 10,
+        size: Math.random() * 6 + 4,
+        color: ['#6366f1', '#10b981', '#f59e0b', '#ec4899'][Math.floor(Math.random() * 4)]
       }));
 
       let opacity = 1;
       function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         particles.forEach(p => {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.vy += 0.2; // 重力
+          p.x += p.vx; p.y += p.vy; p.vy += 0.2;
           ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
         });
-
-        opacity -= 0.02;
+        opacity -= 0.025;
         if (opacity > 0) requestAnimationFrame(animate);
         else ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
