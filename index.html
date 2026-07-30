@@ -374,36 +374,52 @@
         "explanation": "詳細觀念解析"
       }`;
 
-      try {
-        // 使用極速且免費額度最高的 gemini-1.5-flash 模型
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { response_mime_type: "application/json" }
-          })
-        });
+      // 雙版本自動切換相容
+      const endpoints = [
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`
+      ];
 
-        if (!res.ok) {
-          const errBody = await res.json();
-          throw new Error(errBody.error?.message || '呼叫失敗');
+      let lastError = null;
+      let success = false;
+
+      for (const url of endpoints) {
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { response_mime_type: "application/json" }
+            })
+          });
+
+          if (!res.ok) {
+            const errBody = await res.json();
+            throw new Error(errBody.error?.message || '請求失敗');
+          }
+
+          const data = await res.json();
+          let textResult = data.candidates[0].content.parts[0].text;
+          textResult = textResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+          currentQuestion = JSON.parse(textResult);
+
+          displayQuestion(currentQuestion);
+          success = true;
+          break;
+        } catch (err) {
+          lastError = err;
         }
+      }
 
-        const data = await res.json();
-        let textResult = data.candidates[0].content.parts[0].text;
-        textResult = textResult.replace(/```json/gi, '').replace(/```/g, '').trim();
-        currentQuestion = JSON.parse(textResult);
+      document.getElementById('loading').classList.add('hidden');
 
-        displayQuestion(currentQuestion);
-      } catch (err) {
-        alert('出題失敗：' + err.message + '\n請重新整理頁面或檢查 API Key。');
-      } finally {
-        document.getElementById('loading').classList.add('hidden');
+      if (success) {
         document.getElementById('quiz-card').classList.remove('hidden');
+      } else {
+        alert('出題失敗：' + (lastError?.message || '未知錯誤') + '\n請先刪除舊 Key，並點選「+ Create project」重新生成一組 API Key！');
       }
     }
-
     function displayQuestion(q) {
       const badge = document.getElementById('q-badge');
       badge.className = 'subject-badge ';
