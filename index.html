@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="拉布">
-  <title>拉布自然祕笈</title>
+  <meta name="apple-mobile-web-app-title" content="逼逼拉布">
+  <title>拉布自然</title>
   <style>
     :root {
       --primary: #6366f1;
@@ -191,7 +191,7 @@
   <canvas id="confetti-canvas"></canvas>
 
   <header>
-    <div class="app-title">拉布自然祕笈</div>
+    <div class="app-title">拉布自然</div>
     <div class="streak-badge" id="streak-count">🔥 連勝: 0</div>
   </header>
 
@@ -199,7 +199,7 @@
     <div id="tab-quiz">
       <div id="loading" class="card loader-box hidden">
         <div class="spinner"></div>
-        <p style="font-weight: 700; color: var(--primary);" id="loading-text">正在自動配對最佳 AI 模型...</p>
+        <p style="font-weight: 700; color: var(--primary);" id="loading-text">出題中...</p>
       </div>
 
       <div id="quiz-card" class="card hidden">
@@ -224,7 +224,7 @@
       <div class="card">
         <h3 style="font-size: 1.1rem; margin-bottom: 6px;">🔑 Google API Key 設定</h3>
         <input type="text" id="api-key-input" placeholder="貼上 API Key">
-        <button class="btn-action" onclick="saveApiKey()">儲存設定並自動配對</button>
+        <button class="btn-action" onclick="saveApiKey()">儲存設定並開始刷題</button>
       </div>
     </div>
   </div>
@@ -243,7 +243,6 @@
 
   <script>
     let apiKey = localStorage.getItem('gemini_api_key') || '';
-    let selectedModel = localStorage.getItem('gemini_selected_model') || '';
     let currentQuestion = null;
     let mistakes = JSON.parse(localStorage.getItem('mistakes_db') || '[]');
     let streak = 0;
@@ -257,44 +256,11 @@
       }
     };
 
-    // 自動偵測該 Key 支援的 Google AI 模型名稱
-    async function autoDetectModel() {
-      if (!apiKey) return null;
-      try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-        if (!res.ok) throw new Error('API Key 連線失敗');
-        const data = await res.json();
-        if (!data.models || data.models.length === 0) throw new Error('沒有可用的模型');
-
-        // 優先挑選帶有 flash 且支援 generateContent 的模型
-        const flashModel = data.models.find(m => 
-          m.supportedGenerationMethods?.includes("generateContent") && m.name.includes("flash")
-        );
-        const anyModel = data.models.find(m => 
-          m.supportedGenerationMethods?.includes("generateContent")
-        );
-
-        const chosen = flashModel ? flashModel.name : (anyModel ? anyModel.name : null);
-        if (chosen) {
-          selectedModel = chosen; // 例如 "models/gemini-1.5-flash" 或 "models/gemini-2.0-flash"
-          localStorage.setItem('gemini_selected_model', selectedModel);
-          return selectedModel;
-        }
-      } catch (err) {
-        console.warn('模型自動偵測失敗:', err);
-      }
-      return null;
-    }
-
-    async function saveApiKey() {
+    function saveApiKey() {
       const key = document.getElementById('api-key-input').value.trim();
       if (key) {
         localStorage.setItem('gemini_api_key', key);
         apiKey = key;
-        localStorage.removeItem('gemini_selected_model');
-        selectedModel = '';
-        
-        document.getElementById('loading-text').innerText = '正在為你的 API Key 配對最佳模型...';
         document.getElementById('api-warning').classList.add('hidden');
         switchTab('quiz');
         fetchQuestion();
@@ -320,15 +286,6 @@
       document.getElementById('q-explanation').classList.add('hidden');
       document.getElementById('btn-next').classList.add('hidden');
 
-      // 如果尚未獲取過模型，自動向 Google 查詢可用模型
-      if (!selectedModel) {
-        document.getElementById('loading-text').innerText = '正在自動配對你帳號可用的 Gemini 模型...';
-        await autoDetectModel();
-      }
-
-      // 如果偵測出模型，使用偵測到的名稱；否則備用 models/gemini-1.5-flash
-      const modelPath = selectedModel || 'models/gemini-1.5-flash';
-
       const prompt = `你是一個台灣 108 課綱學測自然科命題專家。請出一題符合學測難度的單選題（隨機挑選：物理、化學、生物、地科）。請嚴格遵守回傳純 JSON 格式如下，不要加上任何 markdown 標記：
       {
         "subject": "物理", 
@@ -338,35 +295,53 @@
         "explanation": "詳細觀念解析"
       }`;
 
-      try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${modelPath}:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { response_mime_type: "application/json" }
-          })
-        });
+      // 穩定正式版模型清單（按順序自動備援測試）
+      const candidateModels = [
+        'gemini-2.0-flash',
+        'gemini-1.5-flash',
+        'gemini-1.5-flash-latest',
+        'gemini-2.0-flash-lite'
+      ];
 
-        if (!res.ok) {
-          // 若出錯則重置模型，下次重新偵測
-          localStorage.removeItem('gemini_selected_model');
-          selectedModel = '';
-          const errBody = await res.json();
-          throw new Error(errBody.error?.message || '請求失敗');
+      let success = false;
+      let lastError = null;
+
+      for (const model of candidateModels) {
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { response_mime_type: "application/json" }
+            })
+          });
+
+          if (!res.ok) {
+            const errBody = await res.json();
+            throw new Error(errBody.error?.message || `模型 ${model} 請求失敗`);
+          }
+
+          const data = await res.json();
+          let textResult = data.candidates[0].content.parts[0].text;
+          textResult = textResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+          currentQuestion = JSON.parse(textResult);
+
+          displayQuestion(currentQuestion);
+          success = true;
+          break; // 一旦成功取得題目立刻跳出迴圈！
+        } catch (err) {
+          console.warn(`模型 ${model} 暫時無法回應，切換下一個...`, err.message);
+          lastError = err;
         }
+      }
 
-        const data = await res.json();
-        let textResult = data.candidates[0].content.parts[0].text;
-        textResult = textResult.replace(/```json/gi, '').replace(/```/g, '').trim();
-        currentQuestion = JSON.parse(textResult);
+      document.getElementById('loading').classList.add('hidden');
 
-        displayQuestion(currentQuestion);
+      if (success) {
         document.getElementById('quiz-card').classList.remove('hidden');
-      } catch (err) {
-        alert('出題失敗：' + err.message + '\n系統已重置備用設定，請再次重試！');
-      } finally {
-        document.getElementById('loading').classList.add('hidden');
+      } else {
+        alert('出題失敗：' + (lastError ? lastError.message : '連線異常') + '\n請重新點擊設定檢查 API Key！');
       }
     }
 
