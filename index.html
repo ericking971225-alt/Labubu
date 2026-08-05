@@ -696,7 +696,7 @@ function checkAnswer(selectedOption) {
       closeAddModal();
       
       // 如果目前正在錯題本頁面，則重新渲染並跳至該科目
-      filterWrong(subj, document.querySelector(`#wrong-subject-grid .subject-btn:nth-child(${['全部','物理','化學','生物','地球科學'].indexOf(subj)+1})`));
+     filterWrong(subj, document.querySelector(`#wrong-subject-grid .subject-btn:nth-child(${['全部','物理','化學','生物','地球科學'].indexOf(subj)+1})`));
       alert("錯題已成功儲存！");
     }
 
