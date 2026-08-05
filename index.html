@@ -3,13 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>牙齒自然</title>
+  <title>牙齒自然 - AI 刷題大師</title>
+
+  <!-- PWA & 全螢幕 App 設定 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#6366f1">
+
+  <!-- 🌟 新增這裡：自訂 App 桌面圖案 -->
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" type="image/png" href="icon.png">
+
+  <style>
+    /* 你的 CSS 樣式 ... */
+  </style>
+</head>
+  <!-- PWA & 全螢幕 App 設定 (隱藏網址列，擬真原生 App) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#6366f1">
+
   <style>
     :root {
       --primary: #6366f1;
       --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
       --bg-gradient: linear-gradient(180deg, #f0fdf4 0%, #e0f2fe 50%, #f3e8ff 100%);
-      --card-bg: rgba(255, 255, 255, 0.88);
+      --card-bg: rgba(255, 255, 255, 0.9);
       --card-border: rgba(255, 255, 255, 0.7);
       --text-main: #0f172a;
       --text-muted: #64748b;
@@ -19,30 +40,36 @@
       --wrong-bg: #fee2e2;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg-gradient); color: var(--text-main); min-height: 100vh; padding-bottom: 90px; }
-    header { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(226, 232, 240, 0.8); position: sticky; top: 0; z-index: 20; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg-gradient); color: var(--text-main); min-height: 100vh; padding-bottom: 90px; user-select: none; }
+    header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(226, 232, 240, 0.8); position: sticky; top: 0; z-index: 20; }
     .app-title { font-size: 1.25rem; font-weight: 900; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .streak-badge { background: #fef3c7; color: #b45309; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15); }
     .container { max-width: 500px; margin: 0 auto; padding: 16px; }
     .card { background: var(--card-bg); backdrop-filter: blur(12px); padding: 24px; border-radius: 24px; border: 1px solid var(--card-border); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); margin-bottom: 20px; }
     
+    /* 導覽頁籤 (刷題 vs 錯題本) */
+    .nav-tabs { display: flex; gap: 10px; margin-bottom: 16px; background: rgba(255, 255, 255, 0.6); padding: 6px; border-radius: 16px; }
+    .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; font-size: 0.95rem; font-weight: 800; color: var(--text-muted); border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
     /* 科目選擇格子標籤 */
     .subject-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
     .subject-btn { background: white; border: 2px solid #e2e8f0; border-radius: 14px; padding: 10px 4px; font-size: 0.88rem; font-weight: 700; color: var(--text-muted); cursor: pointer; text-align: center; transition: all 0.2s ease; }
     .subject-btn.active { background: var(--primary-gradient); color: white; border-color: transparent; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); transform: translateY(-2deg); }
 
     .subject-badge { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; font-weight: 800; color: white; margin-bottom: 14px; background: var(--primary); }
-    .question-text { font-size: 1.1rem; line-height: 1.65; font-weight: 600; margin-bottom: 20px; }
+    .question-text { font-size: 1.1rem; line-height: 1.65; font-weight: 600; margin-bottom: 20px; user-select: text; }
     .options { display: flex; flex-direction: column; gap: 12px; }
-    .btn-option { background: white; border: 2px solid #e2e8f0; padding: 14px 18px; border-radius: 16px; text-align: left; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+    .btn-option { background: white; border: 2px solid #e2e8f0; padding: 14px 18px; border-radius: 16px; text-align: left; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.2s; user-select: text; }
     .btn-option.correct { background: var(--correct-bg); border-color: var(--correct); color: #065f46; font-weight: 700; }
     .btn-option.wrong { background: var(--wrong-bg); border-color: var(--wrong); color: #991b1b; font-weight: 700; }
-    .explanation { margin-top: 20px; padding: 16px; background: rgba(241, 245, 249, 0.9); border-left: 4px solid var(--primary); border-radius: 12px; font-size: 0.95rem; line-height: 1.6; }
+    .explanation { margin-top: 20px; padding: 16px; background: rgba(241, 245, 249, 0.9); border-left: 4px solid var(--primary); border-radius: 12px; font-size: 0.95rem; line-height: 1.6; user-select: text; }
     .btn-action { width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 16px; border-radius: 16px; font-size: 1.05rem; font-weight: 700; cursor: pointer; margin-top: 16px; }
+    .btn-delete { background: #fee2e2; color: #ef4444; border: none; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; cursor: pointer; float: right; }
+    
     .loader-box { text-align: center; padding: 40px 20px; }
     .spinner { width: 48px; height: 48px; border: 5px solid rgba(99, 102, 241, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; margin: 0 auto 16px auto; }
-    input[type="text"] { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; margin-top: 10px; font-size: 1rem; }
     .hidden { display: none !important; }
 
     /* 連勝獎勵彈窗 */
@@ -65,56 +92,66 @@
 
   <div class="container">
     
-    <!-- 科目選擇區域 -->
-    <div class="subject-grid">
-      <button class="subject-btn active" onclick="selectSubject('全部', this)">🌐 全科綜合</button>
-      <button class="subject-btn" onclick="selectSubject('物理', this)">⚡ 物理</button>
-      <button class="subject-btn" onclick="selectSubject('化學', this)">🧪 化學</button>
-      <button class="subject-btn" onclick="selectSubject('生物', this)">🧬 生物</button>
-      <button class="subject-btn" onclick="selectSubject('地球科學', this)">🌍 地球科學</button>
+    <!-- 頁籤切換：刷題 vs 錯題本 -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" id="tab-quiz-btn" onclick="switchTab('quiz')">🎯 刷題模式</button>
+      <button class="tab-btn" id="tab-wrong-btn" onclick="switchTab('wrong')">📖 錯題本 (<span id="wrong-count">0</span>)</button>
     </div>
 
-    <!-- 加載中 -->
-    <div id="loading" class="card loader-box hidden">
-      <div class="spinner"></div>
-      <p style="font-weight: 700; color: var(--primary);">出題中...</p>
+    <!-- 刷題 View -->
+    <div id="view-quiz">
+      <!-- 科目選擇區域 -->
+      <div class="subject-grid">
+        <button class="subject-btn active" onclick="selectSubject('全部', this)">🌐 全科綜合</button>
+        <button class="subject-btn" onclick="selectSubject('物理', this)">⚡ 物理</button>
+        <button class="subject-btn" onclick="selectSubject('化學', this)">🧪 化學</button>
+        <button class="subject-btn" onclick="selectSubject('生物', this)">🧬 生物</button>
+        <button class="subject-btn" onclick="selectSubject('地球科學', this)">🌍 地球科學</button>
+      </div>
+
+      <!-- 加載中 -->
+      <div id="loading" class="card loader-box hidden">
+        <div class="spinner"></div>
+        <p style="font-weight: 700; color: var(--primary);">AI 正在生成最新考題...</p>
+      </div>
+
+      <!-- 題目卡片 -->
+      <div id="quiz-card" class="card hidden">
+        <div id="q-badge" class="subject-badge">💡 自然科</div>
+        <div class="question-text" id="q-text"></div>
+        <div class="options" id="q-options"></div>
+        <div id="q-explanation" class="explanation hidden"></div>
+        <button id="btn-next" class="btn-action hidden" onclick="fetchQuestion()">下一題 ➔</button>
+      </div>
     </div>
 
-    <!-- 題目卡片 -->
-    <div id="quiz-card" class="card hidden">
-      <div id="q-badge" class="subject-badge">💡 自然科</div>
-      <div class="question-text" id="q-text"></div>
-      <div class="options" id="q-options"></div>
-      <div id="q-explanation" class="explanation hidden"></div>
-      <button id="btn-next" class="btn-action hidden" onclick="fetchQuestion()">下一題 ➔</button>
+    <!-- 錯題本 View -->
+    <div id="view-wrong" class="hidden">
+      <div id="wrong-list-container"></div>
     </div>
 
-    <!-- API 設定卡片 -->
-    <div id="api-setting" class="card">
-      <h3 style="font-size: 1.1rem; margin-bottom: 6px;">🔑 API Key 設定</h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted);">請貼上 OpenRouter Key (sk-or-...)</p>
-      <input type="text" id="api-key-input" placeholder="貼上 OpenRouter API Key">
-      <button class="btn-action" onclick="saveApiKey()">儲存並開始刷題</button>
-    </div>
   </div>
 
   <!-- 連勝獎勵彈窗 -->
   <div id="reward-modal" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-icon">🌟</div>
-      <div class="modal-title" id="reward-title">🔥 達成 5 連勝！</div>
+      <div class="modal-title" id="reward-title">🔥 突破 5 連勝！</div>
       <div class="modal-msg" id="reward-msg">鼓勵語載入中...</div>
-      <button class="btn-action" onclick="closeRewardModal()">繼續加油，保持節奏 </button>
+      <button class="btn-action" onclick="closeRewardModal()">繼續加油，保持節奏 🚀</button>
     </div>
   </div>
 
   <script>
-    let apiKey = localStorage.getItem('app_api_key') || '';
+    // 預載 API Key（開箱即用）
+    const EMBEDDED_API_KEY = "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";
+
     let currentQuestion = null;
     let streak = 0;
     let currentSubject = '全部';
+    let wrongQuestions = JSON.parse(localStorage.getItem('tooth_wrong_questions') || '[]');
 
-    // 100 句感性學測備考鼓勵語
+    // 100 句感性學測鼓勵語
     const encouragementList = [
       "那些無人問津的黑夜，正悄悄醞釀著屬於你的破曉。",
       "你筆尖流淌過的每一滴墨水，都在為未來的世界鋪路。",
@@ -218,32 +255,27 @@
       "勇敢地往前走吧，全宇宙都會為追夢的你讓路！"
     ];
 
-    // 抽牌池機制：確保 100 句抽完前絕不重複
     let quotePool = [];
 
     function getRandomQuote() {
-      if (quotePool.length === 0) {
-        quotePool = [...encouragementList]; // 當池子空了，重新洗牌補充 100 句
-      }
+      if (quotePool.length === 0) quotePool = [...encouragementList];
       const randomIndex = Math.floor(Math.random() * quotePool.length);
-      return quotePool.splice(randomIndex, 1)[0]; // 抽出並從池子移除，確保不重複
+      return quotePool.splice(randomIndex, 1)[0];
     }
 
     window.onload = () => {
-      if (apiKey) {
-        document.getElementById('api-key-input').value = apiKey;
-        document.getElementById('api-setting').classList.add('hidden');
-        fetchQuestion();
-      }
+      updateWrongCount();
+      fetchQuestion();
     };
 
-    function saveApiKey() {
-      const key = document.getElementById('api-key-input').value.trim();
-      if (key) {
-        localStorage.setItem('app_api_key', key);
-        apiKey = key;
-        document.getElementById('api-setting').classList.add('hidden');
-        fetchQuestion();
+    function switchTab(tab) {
+      document.getElementById('tab-quiz-btn').classList.toggle('active', tab === 'quiz');
+      document.getElementById('tab-wrong-btn').classList.toggle('active', tab === 'wrong');
+      document.getElementById('view-quiz').classList.toggle('hidden', tab !== 'quiz');
+      document.getElementById('view-wrong').classList.toggle('hidden', tab !== 'wrong');
+
+      if (tab === 'wrong') {
+        renderWrongQuestions();
       }
     }
 
@@ -298,7 +330,7 @@
           const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${apiKey.trim()}`,
+              'Authorization': `Bearer ${EMBEDDED_API_KEY.trim()}`,
               'Content-Type': 'application/json',
               'HTTP-Referer': window.location.origin,
               'X-Title': 'GSAT Natural Science App'
@@ -331,8 +363,7 @@
       if (success) {
         document.getElementById('quiz-card').classList.remove('hidden');
       } else {
-        alert('出題失敗：' + lastError + '\n請重新確認 API Key 是否正確！');
-        document.getElementById('api-setting').classList.remove('hidden');
+        alert('出題失敗：' + lastError + '\n請重新確認網路連線！');
       }
     }
 
@@ -358,7 +389,6 @@
       if (selected === currentQuestion.answer) {
         selectedBtn.classList.add('correct');
         streak++;
-        // 每 5 連勝觸發隨機不重複鼓勵語
         if (streak > 0 && streak % 5 === 0) {
           showRewardModal(streak);
         }
@@ -368,6 +398,9 @@
         allBtns.forEach(btn => {
           if (btn.innerText.startsWith(currentQuestion.answer)) btn.classList.add('correct');
         });
+
+        // 答錯時自動加入錯題本（不重複添加）
+        saveToWrongBook(currentQuestion);
       }
 
       document.getElementById('streak-count').innerText = `🔥 連勝: ${streak}`;
@@ -375,6 +408,58 @@
       expBox.innerHTML = `<strong>💡 解析：</strong><br>${currentQuestion.explanation}`;
       expBox.classList.remove('hidden');
       document.getElementById('btn-next').classList.remove('hidden');
+    }
+
+    /* 錯題本邏輯 */
+    function saveToWrongBook(q) {
+      const exists = wrongQuestions.some(item => item.question === q.question);
+      if (!exists) {
+        wrongQuestions.unshift(q);
+        localStorage.setItem('tooth_wrong_questions', JSON.stringify(wrongQuestions));
+        updateWrongCount();
+      }
+    }
+
+    function removeFromWrongBook(index) {
+      wrongQuestions.splice(index, 1);
+      localStorage.setItem('tooth_wrong_questions', JSON.stringify(wrongQuestions));
+      updateWrongCount();
+      renderWrongQuestions();
+    }
+
+    function updateWrongCount() {
+      document.getElementById('wrong-count').innerText = wrongQuestions.length;
+    }
+
+    function renderWrongQuestions() {
+      const container = document.getElementById('wrong-list-container');
+      if (wrongQuestions.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="text-align: center; color: var(--text-muted); padding: 40px 20px;">
+            <p style="font-size: 2.5rem; margin-bottom: 8px;">🎉</p>
+            <p style="font-weight: 700; font-size: 1.1rem;">目前沒有任何錯題記錄！</p>
+            <p style="font-size: 0.85rem; margin-top: 4px;">繼續保持，把自然科全部拿下！</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = wrongQuestions.map((q, idx) => `
+        <div class="card">
+          <button class="btn-delete" onclick="removeFromWrongBook(${idx})">已弄懂 ✕</button>
+          <div class="subject-badge">💡 ${q.subject}</div>
+          <div class="question-text" style="margin-bottom: 12px;">${q.question}</div>
+          <div class="options" style="margin-bottom: 12px;">
+            ${Object.keys(q.options).map(key => `
+              <div class="btn-option ${key === q.answer ? 'correct' : ''}" style="cursor: default; padding: 10px 14px; font-size: 0.95rem;">
+                <b>${key}.</b> ${q.options[key]}
+              </div>
+            `).join('')}
+          </div>
+          <div class="explanation" style="margin-top: 0;">
+            <strong>💡 正確答案與解析：</strong><br>${q.explanation}
+          </div>
+        </div>
+      `).join('');
     }
 
     function showRewardModal(currentStreak) {
