@@ -1,11 +1,11 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
- <link rel="apple-touch-icon" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
   <link rel="icon" type="image/png" href="icon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>拉布</title>
+  <title>拉布刷題</title>
 
   <!-- PWA & 全螢幕 App 設定 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -157,9 +157,9 @@
   </div>
 
   <script>
-    // 📚 內建 108 課綱學測自然科高品質題庫
+    // 📚 題庫資料
     const database = [
-     // ================= ⚡ 物理 (80 題) =================
+ // ================= ⚡ 物理 (80 題) =================
       { subject: "物理", question: "一物體作等加速度直線運動，其速度與時間關係圖（v-t 圖）為何種圖形？", options: { A: "平行時間軸的水平線", B: "斜率不為零的直線", C: "拋物線", D: "雙曲線" }, answer: "B", explanation: "v-t 圖的斜率代表加速度，加速度固定時斜率為常數，故為斜直線。" },
       { subject: "物理", question: "關於牛頓第一運動定律（慣性定律），下列敘述何者正確？", options: { A: "物體不受外力作用時必保持靜止", B: "公車煞車時乘客向前傾是慣性的表現", C: "維持運動必須持續施加外力", D: "質量越大的物體慣性越小" }, answer: "B", explanation: "慣性是維持原運動狀態的性質，質量越大慣性越大。" },
       { subject: "物理", question: "質量 2 kg 物體受 10 N 合力作用，加速度大小為多少 m/s²？", options: { A: "2", B: "5", C: "10", D: "20" }, answer: "B", explanation: "由 F = ma 可得 a = 10 / 2 = 5 m/s²。" },
@@ -1425,205 +1425,314 @@
       }
     ];
 
-    let filteredQuestions = [];
-    let currentIndex = 0;
-    let streak = 0;
+    // 狀態變數
     let currentSubject = '全部';
-    let wrongQuestions = JSON.parse(localStorage.getItem('tooth_wrong_questions') || '[]');
+    let filteredQuestions = [];
+    let currentQIndex = 0;
+    let streak = 0;
+    let wrongList = JSON.parse(localStorage.getItem('labu_wrong_list') || '[]');
+    let answered = false;
 
-    const encouragementList = [
-     "那些無人問津的黑夜，正悄悄醞釀著屬於你的破曉。",
-      "你筆尖流淌過的每一滴墨水，都在為未來的世界鋪路。",
-      "別害怕起步晚或走得慢，只要還在路上，星光就不會熄滅。",
-      "試題本上的每一道紅筆劃痕，都是你戰勝自我留下的勳章。",
-      "當你覺得特別艱難時，正是你正在爬坡、向上邁進的時候。",
-      "夢想從不說話，它只在每一個你想要放棄的瞬間，靜靜看著你。",
-      "請相信，所有看似不起眼的日複一日，都會在某一天讓你驚豔歲月。",
-      "學測不是終點，而是你證明自己能夠為夢想全力以赴的起點。",
-      "願你在最孤獨的備考日子裡，也能聽見自己內心勇敢的聲音。",
-      "今天的疲憊，是明天擁抱理想時最踏實的底氣。",
-      "乾涸的土地才能開出最頑強的花；辛苦的備考才能撐起最燦爛的夢。",
-      "不要去想結果，把每一題寫好，就是對現在的自己最大的溫柔。",
-      "你不是一個人在戰鬥，滿天繁星和每一個奮鬥的夜晚都為你見證。",
-      "允許自己偶爾沮喪，但擦乾眼淚後，別忘了你心裡的遠方。",
-      "每一個算不出答案的時刻，都是觀念正在紮根的證明。",
-      "努力的意義，是讓你在選擇未來時，擁有更多底氣與自由。",
-      "別讓焦慮吞噬了你的節奏，按照自己的步伐，一步步踏實地走。",
-      "考卷上的分數一時起伏，但你積攢的實力永遠不會消失。",
-      "你的名字那麼好看，一定要出現在理想大學的錄取榜單上。",
-      "時間從不語，卻回答了所有的付出與堅持。"
-    ];
-
-    window.onload = () => {
+    // 初始化 App
+    window.onload = function() {
       updateWrongCount();
-      filterSubject('全部');
+      filterQuestions();
+      loadQuestion();
     };
 
+    // 切換頁籤
     function switchTab(tab) {
-      document.getElementById('tab-quiz-btn').classList.toggle('active', tab === 'quiz');
-      document.getElementById('tab-wrong-btn').classList.toggle('active', tab === 'wrong');
-      document.getElementById('view-quiz').classList.toggle('hidden', tab !== 'quiz');
-      document.getElementById('view-wrong').classList.toggle('hidden', tab !== 'wrong');
+      const quizView = document.getElementById('view-quiz');
+      const wrongView = document.getElementById('view-wrong');
+      const quizBtn = document.getElementById('tab-quiz-btn');
+      const wrongBtn = document.getElementById('tab-wrong-btn');
 
-      if (tab === 'wrong') renderWrongQuestions();
+      if (tab === 'quiz') {
+        quizView.classList.remove('hidden');
+        wrongView.classList.add('hidden');
+        quizBtn.classList.add('active');
+        wrongBtn.classList.remove('active');
+      } else {
+        quizView.classList.add('hidden');
+        wrongView.classList.remove('hidden');
+        quizBtn.classList.remove('active');
+        wrongBtn.classList.add('active');
+        renderWrongList();
+      }
     }
 
-    function selectSubject(subject, btn) {
-      document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentSubject = subject;
-      filterSubject(subject);
+    // 選擇科目
+    function selectSubject(subj, btnElement) {
+      document.querySelectorAll('.subject-btn').forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+      currentSubject = subj;
+      filterQuestions();
+      currentQIndex = 0;
+      loadQuestion();
     }
 
-    function filterSubject(subject) {
-      if (subject === '全部') {
+    // 過濾科目題目
+    function filterQuestions() {
+      if (currentSubject === '全部') {
         filteredQuestions = [...database];
       } else {
-        filteredQuestions = database.filter(q => q.subject === subject);
+        filteredQuestions = database.filter(q => q.subject === currentSubject);
       }
-      // 隨機打亂題目順序
+      // 隨機打亂題目
       filteredQuestions.sort(() => Math.random() - 0.5);
-      currentIndex = 0;
-      displayQuestion();
     }
 
-    function displayQuestion() {
-      if (filteredQuestions.length === 0) return;
-      const q = filteredQuestions[currentIndex % filteredQuestions.length];
+    // 載入題目
+    function loadQuestion() {
+      answered = false;
+      const q = filteredQuestions[currentQIndex];
+      if (!q) return;
 
-      document.getElementById('q-badge').innerText = '💡 ' + q.subject;
-      document.getElementById('q-text').innerText = q.question;
-      document.getElementById('q-explanation').classList.add('hidden');
-      document.getElementById('btn-next').classList.add('hidden');
-
+      document.getElementById('q-badge').innerText = q.subject;
+      document.getElementById('q-text').innerText = `${currentQIndex + 1}. ${q.question}`;
+      
       const optionsContainer = document.getElementById('q-options');
       optionsContainer.innerHTML = '';
 
-      Object.keys(q.options).forEach(key => {
+      for (let key in q.options) {
         const btn = document.createElement('button');
         btn.className = 'btn-option';
-        btn.innerHTML = `<b>${key}.</b> ${q.options[key]}`;
-        btn.onclick = () => checkAnswer(key, btn, q);
+        btn.innerText = `${key}. ${q.options[key]}`;
+        btn.onclick = () => checkAnswer(key, q);
         optionsContainer.appendChild(btn);
-      });
+      }
+
+      document.getElementById('q-explanation').classList.add('hidden');
+      document.getElementById('btn-next').classList.add('hidden');
     }
 
-    function checkAnswer(selected, selectedBtn, q) {
-      const allBtns = document.querySelectorAll('.btn-option');
-      allBtns.forEach(btn => btn.onclick = null);
+    // 檢查答案
+    function checkAnswer(selectedOption, question) {
+      if (answered) return;
+      answered = true;
 
-      if (selected === q.answer) {
-        selectedBtn.classList.add('correct');
-        streak++;
-        if (streak > 0 && streak % 5 === 0) {
-          showRewardModal(streak);
+      const isCorrect = (selectedOption === question.answer);
+      const optionBtns = document.querySelectorAll('.btn-option');
+
+      optionBtns.forEach(btn => {
+        const optKey = btn.innerText.charAt(0);
+        if (optKey === question.answer) {
+          btn.classList.add('correct');
+        } else if (optKey === selectedOption && !isCorrect) {
+          btn.classList.add('wrong');
         }
+      });
+
+      // 處理連勝與錯題紀錄
+      if (isCorrect) {
+        streak++;
+        if (streak % 5 === 0) showRewardModal(streak);
       } else {
-        selectedBtn.classList.add('wrong');
         streak = 0;
-        allBtns.forEach(btn => {
-          if (btn.innerText.startsWith(q.answer)) btn.classList.add('correct');
-        });
-        saveToWrongBook(q);
+        addWrongQuestion(question);
       }
 
       document.getElementById('streak-count').innerText = `🔥 連勝: ${streak}`;
-      const expBox = document.getElementById('q-explanation');
-      expBox.innerHTML = `<strong>💡 觀念解析：</strong><br>${q.explanation}`;
-      expBox.classList.remove('hidden');
+      
+      // 顯示解析與下一題按鈕
+      const expDiv = document.getElementById('q-explanation');
+      expDiv.innerHTML = `<strong>解析：</strong> ${question.explanation}`;
+      expDiv.classList.remove('hidden');
       document.getElementById('btn-next').classList.remove('hidden');
     }
 
+    // 下一題
     function nextQuestion() {
-      currentIndex++;
-      displayQuestion();
+      currentQIndex = (currentQIndex + 1) % filteredQuestions.length;
+      loadQuestion();
     }
 
-    function saveToWrongBook(q) {
-      const exists = wrongQuestions.some(item => item.question === q.question);
-      if (!exists) {
-        wrongQuestions.unshift(q);
-        localStorage.setItem('tooth_wrong_questions', JSON.stringify(wrongQuestions));
-        updateWrongCount();
+    // 加入錯題本
+    function addWrongQuestion(q) {
+      if (!wrongList.some(item => item.question === q.question)) {
+        wrongList.push({
+          subject: q.subject,
+          question: q.question,
+          explanation: `正確答案：${q.answer} | ${q.explanation}`
+        });
+        saveWrongList();
       }
     }
 
-    function removeFromWrongBook(index) {
-      wrongQuestions.splice(index, 1);
-      localStorage.setItem('tooth_wrong_questions', JSON.stringify(wrongQuestions));
-      updateWrongCount();
-      renderWrongQuestions();
-    }
-
-    function updateWrongCount() {
-      document.getElementById('wrong-count').innerText = wrongQuestions.length;
-    }
-
-    function renderWrongQuestions() {
+    // 渲染錯題本
+    function renderWrongList() {
       const container = document.getElementById('wrong-list-container');
-      if (wrongQuestions.length === 0) {
-        container.innerHTML = `
-          <div class="card" style="text-align: center; color: var(--text-muted); padding: 40px 20px;">
-            <p style="font-size: 2.5rem; margin-bottom: 8px;">🎉</p>
-            <p style="font-weight: 700; font-size: 1.1rem;">錯題本目前空空如也！</p>
-            <p style="font-size: 0.85rem; margin-top: 4px;">刷題時答錯的題目會自動記錄在這裡喔！</p>
-          </div>`;
+      if (wrongList.length === 0) {
+        container.innerHTML = `<div class="card" style="text-align:center; color: var(--text-muted);">🎉 目前沒有任何錯題紀錄！保持下去！</div>`;
         return;
       }
 
-      container.innerHTML = wrongQuestions.map((q, idx) => `
-        <div class="card">
-          <button class="btn-delete" onclick="removeFromWrongBook(${idx})">已弄懂 ✕</button>
-          <div class="subject-badge">💡 ${q.subject}</div>
-          <div class="question-text" style="margin-bottom: 12px;">${q.question}</div>
-          ${q.options ? `
-          <div class="options" style="margin-bottom: 12px;">
-            ${Object.keys(q.options).map(key => `
-              <div class="btn-option ${key === q.answer ? 'correct' : ''}" style="cursor: default; padding: 10px 14px; font-size: 0.95rem;">
-                <b>${key}.</b> ${q.options[key]}
-              </div>
-            `).join('')}
-          </div>` : ''}
-          <div class="explanation" style="margin-top: 0;">
-            <strong>💡 解析 / 筆記：</strong><br>${q.explanation}
-          </div>
-        </div>
-      `).join('');
+      container.innerHTML = '';
+      wrongList.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <button class="btn-delete" onclick="deleteWrong(${index})">🗑️ 移除</button>
+          <div class="subject-badge">${item.subject}</div>
+          <div class="question-text">${item.question}</div>
+          <div class="explanation">${item.explanation}</div>
+        `;
+        container.appendChild(card);
+      });
     }
 
+    function deleteWrong(index) {
+      wrongList.splice(index, 1);
+      saveWrongList();
+      renderWrongList();
+    }
+
+    function saveWrongList() {
+      localStorage.setItem('labu_wrong_list', JSON.stringify(wrongList));
+      updateWrongCount();
+    }
+
+    function updateWrongCount() {
+      document.getElementById('wrong-count').innerText = wrongList.length;
+    }
+
+    // 彈窗操作
     function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); }
     function closeAddModal() { document.getElementById('add-modal').classList.add('hidden'); }
 
     function saveCustomWrong() {
-      const sub = document.getElementById('custom-subject').value;
-      const qText = document.getElementById('custom-question').value.trim();
-      const expText = document.getElementById('custom-explanation').value.trim();
+      const subject = document.getElementById('custom-subject').value;
+      const question = document.getElementById('custom-question').value.trim();
+      const explanation = document.getElementById('custom-explanation').value.trim();
 
-      if (!qText) { alert("請輸入題目內容"); return; }
+      if (!question || !explanation) {
+        alert('請填寫完整內容！');
+        return;
+      }
 
-      const customObj = {
-        subject: sub,
-        question: qText,
-        options: null,
-        answer: "",
-        explanation: expText || "無附加解析"
-      };
-
-      saveToWrongBook(customObj);
-      renderWrongQuestions();
+      wrongList.unshift({ subject, question, explanation });
+      saveWrongList();
       closeAddModal();
-      document.getElementById('custom-question').value = "";
-      document.getElementById('custom-explanation').value = "";
+      document.getElementById('custom-question').value = '';
+      document.getElementById('custom-explanation').value = '';
+      renderWrongList();
     }
 
-    function showRewardModal(currentStreak) {
-      const quote = encouragementList[Math.floor(Math.random() * encouragementList.length)];
-      document.getElementById('reward-title').innerText = `🔥 突破 ${currentStreak} 連勝！`;
-      document.getElementById('reward-msg').innerText = quote;
-      document.getElementById('reward-modal').classList.remove('hidden');
-    }
+    function showRewardModal(count) {
+  // 隨機從 100 句語錄中抽取一句
+  const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
+  const randomQuote = motivationalQuotes[randomIndex];
 
-    function closeRewardModal() { document.getElementById('reward-modal').classList.add('hidden'); }
-  </script>    
+  document.getElementById('reward-title').innerText = `🔥 突破 ${count} 連勝！`;
+  document.getElementById('reward-msg').innerText = randomQuote;
+  document.getElementById('reward-modal').classList.remove('hidden');
+}
+
+    function closeRewardModal() {
+      document.getElementById('reward-modal').classList.add('hidden');
+    }
+   const motivationalQuotes = [
+  "每一朵花都有自己的花期，感謝你此刻默默紮根的勇敢。",
+  "那些看似枯燥的重複，都是你未來驚艷歲月的伏筆。",
+  "星光不問趕路人，時光不負有心人。",
+  "你的每一次堅持，都在為未來的自己鋪設通往自由的路。",
+  "不要急著要答案，生活總會在不經意間給予你最溫柔的解答。",
+  "漫長的長夜裡，你獨自亮起的燈光，比星辰還要耀眼。",
+  "跑得慢一點沒關係，只要腳步一直朝向光的方向。",
+  "今天的每一分努力，都是在給未來的自己準備驚喜。",
+  "願你擁有破土而出的勇氣，也有靜待花開的耐性。",
+  "最深的沉澱，往往能換來最絢爛的綻放。",
+  "即使現在的路有些孤單，也要相信自己正走在正確的軌道上。",
+  "願你在繁雜的世界裡，始終握緊自己心中的那一抹微光。",
+  "成長就是把哭聲調成靜音，然後在沉默中羽化成蝶。",
+  "那些你獨自熬過的深夜，終將匯聚成照亮未來的曙光。",
+  "每一步腳踏實地的累積，都是對夢想最溫柔的回答。",
+  "成長不是一蹴而就的奇蹟，而是點滴累積的奇蹟。",
+  "即使微小如塵埃，也可以擁有一片屬於自己的星空。",
+  "願你不被歲月打磨去稜角，只被歲月淬煉出光芒。",
+  "允許自己慢慢來，因為最美的風景往往需要最長久的等待。",
+  "你的專注與堅持，正一點一滴重塑著更好的自己。",
+  "世界很嘈雜，但你認真思考的模樣極為動人。",
+  "莫道桑榆晚，微霞尚滿天；每一刻的開始都不算太遲。",
+  "努力不是為了超越別人，而是為了遇見更棒的自己。",
+  "那些你以為踩過的坑，其實都是撐起未來的基石。",
+  "在沒有人的角落裡默默耕耘，終會在陽光下擁抱豐收。",
+  "願你眼裡有光，心中有愛，腳下永遠有路。",
+  "慢慢走，比較快；穩穩過，最心安。",
+  "你現在寫下的每一題，都是給未來夢想的承諾。",
+  "哪怕只有一點點進步，也值得給自己一個大大的擁抱。",
+  "所有的驚艷，都來自於長久以來不為人知的堅持。",
+  "願你無畏歲月的風雨，溫柔且堅定地成長。",
+  "即使路途遙遠，只要起步，就已經領先了停滯不前的人。",
+  "歲月會獎賞每一個默默耕耘、不輕言放棄的人。",
+  "勇敢不是不害怕，而是即便害怕，依然選擇昂首前行。",
+  "你的汗水不會騙人，它會在時間裡綻放成最美的花朵。",
+  "在這個急躁的世界裡，能夠靜下心來努力的你非常了不起。",
+  "願你像一顆種子，在黑暗的土壤裡靜靜積蓄力量。",
+  "每一次超越昨天的自己，都是一次值得慶賀的勝利。",
+  "心之所向，素履以往；生如逆旅，一往無前。",
+  "不用追趕別人的步伐，你有自己的季節與節奏。",
+  "那些看似微不足道的堅持，終將搭起通往理想的橋樑。",
+  "保持熱愛，奔赴山海；願你的努力都能換來溫暖的擁抱。",
+  "你所熱愛的，終將成為帶領你穿越迷霧的光芒。",
+  "願你歷經千帆，歸來仍是心中有夢的少年。",
+  "那些留在試卷上的墨跡，都是你向未來遞出的名片。",
+  "相信時間的力量，它會把最好的結果留給最執著的人。",
+  "哪怕風浪再大，也別忘了自己擁有划槳的勇氣。",
+  "今天的辛苦不是折磨，而是生命賦予你的獨特徽章。",
+  "願你低頭有堅實的腳步，抬頭有遼闊的星海。",
+  "成長的道路或許孤獨，但靈魂會在過程中變得無比豐盈。",
+  "每一道被破解的難題，都是你向自由靠近的一小步。",
+  "不要小看今天的點滴進步，大海也是由無數溪流匯聚而成。",
+  "願你即使經歷風雨，依然保有對這個世界最初的熱情。",
+  "夢想不會發光，發光的是那個為了夢想永不服輸的你。",
+  "當你感到艱難時，代表你正在走上一條上坡的路。",
+  "願你的心靈如深海般平靜，力量如磐石般堅定。",
+  "不必逢人訴說辛苦，時間會替你的成果發聲。",
+  "每一次重新站起來，都是對生命最動人的謳歌。",
+  "願你活成自己喜歡的樣子，溫柔中帶有不可戰勝的韌性。",
+  "那些默默努力的日子，終會散發出耀眼的光彩。",
+  "最美好的事物，往往值得最長久的等待與付出。",
+  "願你心有大海，便不致於困在眼前的小小泥濘。",
+  "堅持不是為了證明什麼，而是為了不辜負自己的潛力。",
+  "你專注的神情，就是這個房間裡最美好的風景。",
+  "哪怕進展緩慢，只要方向正確，終會抵達理想的彼岸。",
+  "願你在孤獨的歲月裡，學會自己成為自己的光。",
+  "每一筆劃過的軌跡，都是你為夢想築起的基石。",
+  "別害怕犯錯，錯題是命運送給你通往完美的禮物。",
+  "願你有前行的勇氣，也有停下歇息的坦然。",
+  "生命中的每一段經歷，都有它獨特而深遠的意義。",
+  "保持一顆謙卑而專注的心，世界自會為你展開奇蹟。",
+  "願你的堅持能穿透迷霧，指引你走向花開的大陸。",
+  "你此刻的努力，正默默驚艷著未來的某個時光。",
+  "即使步履蹣跚，也請相信自己擁有走向終點的力量。",
+  "願你被歲月溫柔以待，更願你在歲月中學會勇敢。",
+  "每一顆認真思考的腦袋，都在閃爍著智慧的光芒。",
+  "成功不是偶然的降臨，而是無數次堅持的必然累積。",
+  "願你的熱情永不褪色，願你的勇氣歷久彌新。",
+  "那些你曾以為過不去的坎，終將成為你榮耀的獎盃。",
+  "專注於當下的每一秒，你正在創造屬於自己的歷史。",
+  "願你的夢想清澈而遠大，願你的腳步穩健而有力。",
+  "不去想遠方的風雨，只管踏實走好當下的每一步。",
+  "你的堅持，正在為這個世界增添一份動人的力量。",
+  "願你心中的火焰永遠熾熱，不受世俗風霜侵蝕。",
+  "每一滴流過的汗水，都是潤澤夢想花朵的甘霖。",
+  "成長的代價是痛楚，但成長的禮物是無限的自由。",
+  "願你在漫長的中途站裡，不失落、不迷茫、不放棄。",
+  "只要心懷希望，每一個平凡的日子都能過得熠熠生輝。",
+  "你的堅持，是給這個焦慮世界最溫柔的反擊。",
+  "願你擁有不隨波逐流的勇氣，也有隨遇而安的智慧。",
+  "那些默默積蓄的能量，終會在某個時刻瞬間爆發。",
+  "即使前路漫漫，只要心中有光，便不懼黑暗侵襲。",
+  "願你在每一次挑戰中，都能遇見一個更加堅強的自己。",
+  "堅持並非咬牙切齒，而是帶著愛與希望溫和地前行。",
+  "你的每一次努力，都在讓未來的自己更加感激現在。",
+  "願你歷經歲月洗禮，依然保有一顆對知識的好奇心。",
+  "那些看似不起眼的日復一日，會突然在某天讓你看到堅持的意義。",
+  "願你的眼光跨越眼前的困難，看見遼闊的星辰大海。",
+  "不論世界如何變化，保持專注與善良永遠是你最強大的武器。",
+  "謝謝你沒有放棄，未來的你，一定會感謝現在這個閃閃發光的自己。"
+];
+  </script>
 </body>
 </html>
