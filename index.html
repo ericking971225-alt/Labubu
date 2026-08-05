@@ -112,35 +112,21 @@
 
     <!-- 錯題本 View -->
     <div id="view-wrong" class="hidden">
-     <!-- 上傳區塊 -->
-<div class="upload-section">
-  <!-- 1. 檔案上傳輸入框 -->
-  <input type="file" id="imageInput" accept="image/*">
-  
-  <!-- 2. 觸發分析的按鈕 -->
-  <button onclick="analyzeUploadedImage()">開始 AI 圖片分析</button>
-</div>
+  <!-- 上傳照片 / 拍照按鈕 (已開放相簿選擇) -->
+      <button class="btn-action btn-camera" onclick="document.getElementById('photo-input').click()">
+        🖼️ 選擇照片 / 📷 拍照分析錯題
+      </button>
+      <input type="file" id="photo-input" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
 
-<!-- Loading 提示元件 -->
-<div id="loadingState" style="display: none;">
-  <p>⏳ AI 正在壓縮並分析考題圖片...</p>
-</div>
+      <div id="wrong-loading" class="card loader-box hidden">
+        <div class="spinner"></div>
+        <p style="font-weight: 700; color: #059669;" id="wrong-loading-text">AI 正在壓縮並分析考題圖片...</p>
+      </div>
 
-<!-- 錯題本結果顯示區塊 -->
-<div id="resultContainer" style="display: none;">
-  <h3>標籤：<span id="resSubject"></span> - <span id="resConcept"></span></h3>
-  
-  <p><strong>題目：</strong></p>
-  <div id="resQuestion"></div>
-  
-  <p><strong>正確答案：</strong> <span id="resAnswer"></span></p>
-  
-  <p><strong>詳細解析：</strong></p>
-  <div id="resExplanation"></div>
-  
-  <p><strong>常錯盲點：</strong></p>
-  <div id="resErrorAnalysis"></div>
-</div>
+      <div id="wrong-list-container"></div>
+    </div>
+
+  </div>
 
   <!-- 連勝獎勵彈窗 -->
   <div id="reward-modal" class="modal-overlay hidden">
