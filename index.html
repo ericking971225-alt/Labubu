@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+  <div style="font-size: 24px; color: red;">
+  測試公式：$E = mc^2$ 
+  測試分數：$\frac{1}{2}$
+</div>
 <!-- 建議先放這幾行基本設定 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -12,14 +16,11 @@
     tex: {
       inlineMath: [['$', '$'], ['\\(', '\\)']],
       displayMath: [['$$', '$$'], ['\\[', '\\]']]
-    },
-    startup: {
-      typeset: false // 告訴 MathJax 先不要自動排版，等我們用 JS 手動呼叫
     }
+    // 把 startup 那個區塊整個刪除，讓它預設自動啟動
   };
 </script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
   <!-- PWA & 全螢幕 App 設定 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
