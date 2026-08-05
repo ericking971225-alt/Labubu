@@ -1425,28 +1425,29 @@
       }
     ];
 
-    // 狀態變數
+   // 狀態變數
     let currentSubject = '全部';
     let filteredQuestions = [];
-    let currentQIndex = 0;
+    let currentQuestion = null;
     let streak = 0;
-    let wrongList = JSON.parse(localStorage.getItem('labu_wrong_list') || '[]');
-    let answered = false;
+    let wrongList = JSON.parse(localStorage.getItem('wrongList')) || [];
 
-    // 初始化 App
-    window.onload = function() {
-      updateWrongCount();
+   // 初始化頁面
+    window.onload = () => {
       filterQuestions();
-      loadQuestion();
+      nextQuestion();
+      updateWrongCount();
+      renderWrongList();
     };
 
     // 切換頁籤
+    // 分頁切換
     function switchTab(tab) {
-      const quizView = document.getElementById('view-quiz');
-      const wrongView = document.getElementById('view-wrong');
-      const quizBtn = document.getElementById('tab-quiz-btn');
-      const wrongBtn = document.getElementById('tab-wrong-btn');
-
+      document.getElementById('view-quiz').classList.toggle('hidden', tab !== 'quiz');
+      document.getElementById('view-wrong').classList.toggle('hidden', tab !== 'wrong');
+      document.getElementById('tab-quiz-btn').classList.toggle('active', tab === 'quiz');
+      document.getElementById('tab-wrong-btn').classList.toggle('active', tab === 'wrong');
+    }
       if (tab === 'quiz') {
         quizView.classList.remove('hidden');
         wrongView.classList.add('hidden');
@@ -1462,15 +1463,13 @@
     }
 
     // 選擇科目
-    function selectSubject(subj, btnElement) {
-      document.querySelectorAll('.subject-btn').forEach(btn => btn.classList.remove('active'));
-      btnElement.classList.add('active');
-      currentSubject = subj;
+   function selectSubject(subject, btn) {
+      document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSubject = subject;
       filterQuestions();
-      currentQIndex = 0;
-      loadQuestion();
+      nextQuestion();
     }
-
     // 過濾科目題目
     function filterQuestions() {
       if (currentSubject === '全部') {
@@ -1478,6 +1477,31 @@
       } else {
         filteredQuestions = database.filter(q => q.subject === currentSubject);
       }
+    }
+   / 抽題與渲染
+    function nextQuestion() {
+      if (filteredQuestions.length === 0) return;
+      
+      const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
+      currentQuestion = filteredQuestions[randomIndex];
+
+      document.getElementById('q-badge').innerText = `💡 ${currentQuestion.subject}`;
+      document.getElementById('q-text').innerText = currentQuestion.question;
+      
+      const optionsContainer = document.getElementById('q-options');
+      optionsContainer.innerHTML = '';
+      
+      Object.entries(currentQuestion.options).forEach(([key, optText]) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-option';
+        btn.innerText = `${key}. ${optText}`;
+        btn.onclick = () => checkAnswer(key, btn);
+        optionsContainer.appendChild(btn);
+      });
+
+      document.getElementById('q-explanation').classList.add('hidden');
+      document.getElementById('btn-next').classList.add('hidden');
+    }
       // 隨機打亂題目
       filteredQuestions.sort(() => Math.random() - 0.5);
     }
