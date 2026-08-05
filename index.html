@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <!-- 1. MathJax 設定：允許使用 $ 作為單行數學公式的開頭與結尾 -->
+<!-- 1. MathJax 安全設定檔 (一定要在引入套件的上方) -->
 <script>
   window.MathJax = {
     tex: {
       inlineMath: [['$', '$'], ['\\(', '\\)']],
       displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    },
+    startup: {
+      typeset: false // 告訴 MathJax 先不要自動渲染，交給我們用 JS 手動觸發
     }
   };
 </script>
 
-<!-- 2. 引入 MathJax 渲染引擎 -->
+<!-- 2. 引入套件 -->
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
