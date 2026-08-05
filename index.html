@@ -3,10 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="逼逼拉布">
-  <title>拉布自然</title>
+  <title>學測自然 AI 刷題大師</title>
   <style>
     :root {
       --primary: #6366f1;
@@ -20,238 +17,68 @@
       --correct-bg: #d1fae5;
       --wrong: #ef4444;
       --wrong-bg: #fee2e2;
-      
-      --physics: #0284c7;
-      --chemistry: #8b5cf6;
-      --biology: #059669;
-      --earth: #d97706;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-
-    body {
-      background: var(--bg-gradient);
-      background-attachment: fixed;
-      color: var(--text-main);
-      min-height: 100vh;
-      padding-bottom: 90px;
-    }
-
-    header {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-
-    .app-title {
-      font-size: 1.15rem;
-      font-weight: 800;
-      background: var(--primary-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .streak-badge {
-      background: #fef3c7;
-      color: #b45309;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      box-shadow: 0 2px 4px rgba(245, 158, 11, 0.15);
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg-gradient); color: var(--text-main); min-height: 100vh; padding-bottom: 90px; }
+    header { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(226, 232, 240, 0.8); position: sticky; top: 0; z-index: 20; }
+    .app-title { font-size: 1.15rem; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .streak-badge { background: #fef3c7; color: #b45309; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; }
     .container { max-width: 500px; margin: 0 auto; padding: 16px; }
-
-    .card {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      padding: 24px;
-      border-radius: 24px;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-      margin-bottom: 20px;
-    }
-
-    .subject-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 6px 14px;
-      border-radius: 30px;
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: white;
-      margin-bottom: 14px;
-    }
-    .bg-physics { background: var(--physics); }
-    .bg-chemistry { background: var(--chemistry); }
-    .bg-biology { background: var(--biology); }
-    .bg-earth { background: var(--earth); }
-    .bg-default { background: var(--primary); }
-
-    .question-text {
-      font-size: 1.1rem;
-      line-height: 1.65;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
+    .card { background: var(--card-bg); backdrop-filter: blur(12px); padding: 24px; border-radius: 24px; border: 1px solid var(--card-border); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); margin-bottom: 20px; }
+    .subject-badge { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; font-weight: 800; color: white; margin-bottom: 14px; background: var(--primary); }
+    .question-text { font-size: 1.1rem; line-height: 1.65; font-weight: 600; margin-bottom: 20px; }
     .options { display: flex; flex-direction: column; gap: 12px; }
-
-    .btn-option {
-      background: white;
-      border: 2px solid #e2e8f0;
-      padding: 14px 18px;
-      border-radius: 16px;
-      text-align: left;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
+    .btn-option { background: white; border: 2px solid #e2e8f0; padding: 14px 18px; border-radius: 16px; text-align: left; font-size: 1rem; font-weight: 500; cursor: pointer; }
     .btn-option.correct { background: var(--correct-bg); border-color: var(--correct); color: #065f46; font-weight: 700; }
     .btn-option.wrong { background: var(--wrong-bg); border-color: var(--wrong); color: #991b1b; font-weight: 700; }
-
-    .explanation {
-      margin-top: 20px;
-      padding: 16px;
-      background: rgba(241, 245, 249, 0.9);
-      border-left: 4px solid var(--primary);
-      border-radius: 12px;
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
-
-    .btn-action {
-      width: 100%;
-      background: var(--primary-gradient);
-      color: white;
-      border: none;
-      padding: 16px;
-      border-radius: 16px;
-      font-size: 1.05rem;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 16px;
-    }
-
+    .explanation { margin-top: 20px; padding: 16px; background: rgba(241, 245, 249, 0.9); border-left: 4px solid var(--primary); border-radius: 12px; font-size: 0.95rem; line-height: 1.6; }
+    .btn-action { width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 16px; border-radius: 16px; font-size: 1.05rem; font-weight: 700; cursor: pointer; margin-top: 16px; }
     .loader-box { text-align: center; padding: 40px 20px; }
-    .spinner {
-      width: 48px;
-      height: 48px;
-      border: 5px solid rgba(99, 102, 241, 0.2);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 1s infinite linear;
-      margin: 0 auto 16px auto;
-    }
-
-    .nav-bar {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      display: flex;
-      border-top: 1px solid rgba(226, 232, 240, 0.8);
-      padding-bottom: env(safe-area-inset-bottom);
-      z-index: 100;
-    }
-
-    .nav-item {
-      flex: 1; text-align: center; padding: 12px 0 8px 0;
-      font-size: 0.75rem; font-weight: 600; color: var(--text-muted); cursor: pointer;
-    }
-    .nav-item .icon { font-size: 1.4rem; display: block; margin-bottom: 2px; }
-    .nav-item.active { color: var(--primary); }
-
-    input[type="text"] {
-      width: 100%; padding: 14px; border: 2px solid #e2e8f0;
-      border-radius: 12px; margin-top: 10px; font-size: 1rem; outline: none;
-    }
-
+    .spinner { width: 48px; height: 48px; border: 5px solid rgba(99, 102, 241, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; margin: 0 auto 16px auto; }
+    input[type="text"] { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; margin-top: 10px; font-size: 1rem; }
     .hidden { display: none !important; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    #confetti-canvas { position: fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:999; }
   </style>
 </head>
 <body>
 
-  <canvas id="confetti-canvas"></canvas>
-
   <header>
-    <div class="app-title">拉布自然</div>
+    <div class="app-title">🚀 學測自然 AI 大師</div>
     <div class="streak-badge" id="streak-count">🔥 連勝: 0</div>
   </header>
 
   <div class="container">
-    <div id="tab-quiz">
-      <div id="loading" class="card loader-box hidden">
-        <div class="spinner"></div>
-        <p style="font-weight: 700; color: var(--primary);" id="loading-text">出題中...</p>
-      </div>
-
-      <div id="quiz-card" class="card hidden">
-        <div id="q-badge" class="subject-badge bg-default">💡 自然科</div>
-        <div class="question-text" id="q-text">題目載入中...</div>
-        <div class="options" id="q-options"></div>
-        <div id="q-explanation" class="explanation hidden"></div>
-        <button id="btn-next" class="btn-action hidden" onclick="fetchQuestion()">下一題 ➔</button>
-      </div>
-
-      <div id="api-warning" class="card">
-        <h3 style="font-size: 1.2rem; margin-bottom: 8px;">✨ 歡迎開啟學測自然刷題之旅</h3>
-        <p style="color: var(--text-muted); font-size: 0.95rem;">請點擊下方 <b>「⚙️ 設定」</b> 貼上你的 API Key 即可自動開啟出題！</p>
-      </div>
+    <div id="loading" class="card loader-box hidden">
+      <div class="spinner"></div>
+      <p style="font-weight: 700; color: var(--primary);">AI 出題中...</p>
     </div>
 
-    <div id="tab-mistakes" class="hidden">
-      <div id="mistakes-list"></div>
+    <div id="quiz-card" class="card hidden">
+      <div id="q-badge" class="subject-badge">💡 自然科</div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <div id="q-explanation" class="explanation hidden"></div>
+      <button id="btn-next" class="btn-action hidden" onclick="fetchQuestion()">下一題 ➔</button>
     </div>
 
-    <div id="tab-settings" class="hidden">
-      <div class="card">
-        <h3 style="font-size: 1.1rem; margin-bottom: 6px;">🔑 Google API Key 設定</h3>
-        <input type="text" id="api-key-input" placeholder="貼上 API Key">
-        <button class="btn-action" onclick="saveApiKey()">儲存設定並開始刷題</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="nav-bar">
-    <div class="nav-item active" onclick="switchTab('quiz')">
-      <span class="icon">📝</span>每日刷題
-    </div>
-    <div class="nav-item" onclick="switchTab('mistakes')">
-      <span class="icon">📚</span>錯題本 (<span id="mistake-count">0</span>)
-    </div>
-    <div class="nav-item" onclick="switchTab('settings')">
-      <span class="icon">⚙️</span>設定
+    <div id="api-setting" class="card">
+      <h3 style="font-size: 1.1rem; margin-bottom: 6px;">🔑 API Key 設定</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">可貼上 OpenRouter Key (sk-or-...) 或正常的 Google Key</p>
+      <input type="text" id="api-key-input" placeholder="貼上 API Key">
+      <button class="btn-action" onclick="saveApiKey()">儲存並開始刷題</button>
     </div>
   </div>
 
   <script>
-    let apiKey = localStorage.getItem('gemini_api_key') || '';
+    let apiKey = localStorage.getItem('app_api_key') || '';
     let currentQuestion = null;
-    let mistakes = JSON.parse(localStorage.getItem('mistakes_db') || '[]');
     let streak = 0;
 
     window.onload = () => {
-      updateMistakeCount();
       if (apiKey) {
         document.getElementById('api-key-input').value = apiKey;
-        document.getElementById('api-warning').classList.add('hidden');
+        document.getElementById('api-setting').classList.add('hidden');
         fetchQuestion();
       }
     };
@@ -259,28 +86,14 @@
     function saveApiKey() {
       const key = document.getElementById('api-key-input').value.trim();
       if (key) {
-        localStorage.setItem('gemini_api_key', key);
+        localStorage.setItem('app_api_key', key);
         apiKey = key;
-        document.getElementById('api-warning').classList.add('hidden');
-        switchTab('quiz');
+        document.getElementById('api-setting').classList.add('hidden');
         fetchQuestion();
       }
     }
 
-    function switchTab(tabName) {
-      document.querySelectorAll('.nav-item').forEach((item, idx) => {
-        item.classList.toggle('active', (tabName === 'quiz' && idx === 0) || (tabName === 'mistakes' && idx === 1) || (tabName === 'settings' && idx === 2));
-      });
-      document.getElementById('tab-quiz').classList.toggle('hidden', tabName !== 'quiz');
-      document.getElementById('tab-mistakes').classList.toggle('hidden', tabName !== 'mistakes');
-      document.getElementById('tab-settings').classList.toggle('hidden', tabName !== 'settings');
-
-      if (tabName === 'mistakes') renderMistakes();
-    }
-
     async function fetchQuestion() {
-      if (!apiKey) return;
-      
       document.getElementById('loading').classList.remove('hidden');
       document.getElementById('quiz-card').classList.add('hidden');
       document.getElementById('q-explanation').classList.add('hidden');
@@ -295,20 +108,27 @@
         "explanation": "詳細觀念解析"
       }`;
 
-      // 穩定正式版模型清單（按順序自動備援測試）
-      const candidateModels = [
-        'gemini-2.0-flash',
-        'gemini-1.5-flash',
-        'gemini-1.5-flash-latest',
-        'gemini-2.0-flash-lite'
-      ];
+      try {
+        let res, textResult;
 
-      let success = false;
-      let lastError = null;
-
-      for (const model of candidateModels) {
-        try {
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        // 判斷金鑰類型 (OpenRouter 或 Google)
+        if (apiKey.startsWith('sk-or-')) {
+          res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: 'google/gemini-2.0-flash-001',
+              messages: [{ role: 'user', content: prompt }]
+            })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error?.message || 'OpenRouter 請求失敗');
+          textResult = data.choices[0].message.content;
+        } else {
+          res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -316,54 +136,34 @@
               generationConfig: { response_mime_type: "application/json" }
             })
           });
-
-          if (!res.ok) {
-            const errBody = await res.json();
-            throw new Error(errBody.error?.message || `模型 ${model} 請求失敗`);
-          }
-
           const data = await res.json();
-          let textResult = data.candidates[0].content.parts[0].text;
-          textResult = textResult.replace(/```json/gi, '').replace(/```/g, '').trim();
-          currentQuestion = JSON.parse(textResult);
-
-          displayQuestion(currentQuestion);
-          success = true;
-          break; // 一旦成功取得題目立刻跳出迴圈！
-        } catch (err) {
-          console.warn(`模型 ${model} 暫時無法回應，切換下一個...`, err.message);
-          lastError = err;
+          if (!res.ok) throw new Error(data.error?.message || 'Google API 請求失敗');
+          textResult = data.candidates[0].content.parts[0].text;
         }
-      }
 
-      document.getElementById('loading').classList.add('hidden');
+        textResult = textResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+        currentQuestion = JSON.parse(textResult);
 
-      if (success) {
+        displayQuestion(currentQuestion);
         document.getElementById('quiz-card').classList.remove('hidden');
-      } else {
-        alert('出題失敗：' + (lastError ? lastError.message : '連線異常') + '\n請重新點擊設定檢查 API Key！');
+      } catch (err) {
+        alert('出題失敗：' + err.message);
+        document.getElementById('api-setting').classList.remove('hidden');
+      } finally {
+        document.getElementById('loading').classList.add('hidden');
       }
     }
 
     function displayQuestion(q) {
-      const badge = document.getElementById('q-badge');
-      badge.className = 'subject-badge ';
-      
-      if (q.subject.includes('物理')) { badge.classList.add('bg-physics'); badge.innerText = '⚛️ 物理'; }
-      else if (q.subject.includes('化學')) { badge.classList.add('bg-chemistry'); badge.innerText = '🧪 化學'; }
-      else if (q.subject.includes('生物')) { badge.classList.add('bg-biology'); badge.innerText = '🧬 生物'; }
-      else if (q.subject.includes('地')) { badge.classList.add('bg-earth'); badge.innerText = '🌍 地球科學'; }
-      else { badge.classList.add('bg-default'); badge.innerText = '💡 ' + q.subject; }
-
+      document.getElementById('q-badge').innerText = '💡 ' + q.subject;
       document.getElementById('q-text').innerText = q.question;
-      
       const optionsContainer = document.getElementById('q-options');
       optionsContainer.innerHTML = '';
 
       Object.keys(q.options).forEach(key => {
         const btn = document.createElement('button');
         btn.className = 'btn-option';
-        btn.innerHTML = `<span><b>${key}.</b> ${q.options[key]}</span>`;
+        btn.innerHTML = `<b>${key}.</b> ${q.options[key]}`;
         btn.onclick = () => checkAnswer(key, btn);
         optionsContainer.appendChild(btn);
       });
@@ -373,88 +173,26 @@
       const allBtns = document.querySelectorAll('.btn-option');
       allBtns.forEach(btn => btn.onclick = null);
 
-      const isCorrect = selected === currentQuestion.answer;
-      
-      if (isCorrect) {
+      if (selected === currentQuestion.answer) {
         selectedBtn.classList.add('correct');
         streak++;
-        fireConfetti();
       } else {
         selectedBtn.classList.add('wrong');
         streak = 0;
-        mistakes.push({ ...currentQuestion, date: new Date().toLocaleDateString() });
-        localStorage.setItem('mistakes_db', JSON.stringify(mistakes));
-        updateMistakeCount();
-
         allBtns.forEach(btn => {
-          if (btn.innerText.startsWith(currentQuestion.answer)) {
-            btn.classList.add('correct');
-          }
+          if (btn.innerText.startsWith(currentQuestion.answer)) btn.classList.add('correct');
         });
       }
 
       document.getElementById('streak-count').innerText = `🔥 連勝: ${streak}`;
       const expBox = document.getElementById('q-explanation');
-      expBox.innerHTML = `<strong>💡 觀念解析：</strong><br>${currentQuestion.explanation}`;
+      expBox.innerHTML = `<strong>💡 解析：</strong><br>${currentQuestion.explanation}`;
       expBox.classList.remove('hidden');
       document.getElementById('btn-next').classList.remove('hidden');
     }
-
-    function updateMistakeCount() {
-      document.getElementById('mistake-count').innerText = mistakes.length;
-    }
-
-    function renderMistakes() {
-      const container = document.getElementById('mistakes-list');
-      if (mistakes.length === 0) {
-        container.innerHTML = `<div class="card" style="text-align:center; color:var(--text-muted);">🎉 尚無錯題紀錄！</div>`;
-        return;
-      }
-
-      container.innerHTML = mistakes.map((item, index) => `
-        <div class="card">
-          <div class="subject-badge bg-default">📍 ${item.subject} (${item.date})</div>
-          <div class="question-text">${item.question}</div>
-          <div style="font-size:0.95rem; color:var(--correct); font-weight:700; margin-bottom:8px;">✅ 正確答案：${item.answer}. ${item.options[item.answer]}</div>
-          <div class="explanation"><strong>觀念解析：</strong><br>${item.explanation}</div>
-          <button class="btn-action" style="background:#ef4444; margin-top:12px;" onclick="removeMistake(${index})">移出錯題本</button>
-        </div>
-      `).join('');
-    }
-
-    function removeMistake(index) {
-      mistakes.splice(index, 1);
-      localStorage.setItem('mistakes_db', JSON.stringify(mistakes));
-      updateMistakeCount();
-      renderMistakes();
-    }
-
-    function fireConfetti() {
-      const canvas = document.getElementById('confetti-canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      const particles = Array.from({ length: 40 }, () => ({
-        x: canvas.width / 2, y: canvas.height / 2,
-        vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.7) * 10,
-        size: Math.random() * 6 + 4,
-        color: ['#6366f1', '#10b981', '#f59e0b', '#ec4899'][Math.floor(Math.random() * 4)]
-      }));
-
-      let opacity = 1;
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-          p.x += p.vx; p.y += p.vy; p.vy += 0.2;
-          ctx.fillStyle = p.color;
-          ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-        });
-        opacity -= 0.025;
-        if (opacity > 0) requestAnimationFrame(animate);
-        else ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-      animate();
+  </script>
+</body>
+</html>
     }
   </script>
 </body>
