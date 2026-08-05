@@ -142,7 +142,7 @@
 
     <!-- 建議放在題目卡片內頂部的標籤區塊 -->
 <div class="flex justify-between items-center mb-3">
-  <span id="subject-tag" class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">物理</span>
+  <span id="subject-tag" class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded"></span>
   
   <!-- ⏱️ 新增計時器 display -->
   <div class="flex items-center text-gray-600 font-mono text-sm bg-gray-100 px-3 py-1 rounded-full border">
@@ -203,9 +203,12 @@
   </div>
  <script src="data.js"></script>
  <script>
-   // 重新排版畫面上的數學公式
 function renderMath() {
   if (window.MathJax && window.MathJax.typesetPromise) {
+    // 重置 MathJax 狀態，確保它能重新掃描整個畫面
+    if (window.MathJax.texReset) window.MathJax.texReset();
+    
+    // 執行排版渲染
     MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err));
   }
 }
@@ -455,6 +458,7 @@ function updateTimerDisplay() {
     let wrongBookFilterSubject = '全部';
 
     function init() {
+      renderMath();
       selectSubject('全部', document.querySelector('.subject-btn.active'));
       document.getElementById('wrong-count').innerText = wrongBook.length;
     }
