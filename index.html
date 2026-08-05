@@ -64,8 +64,8 @@
 
     <div id="api-setting" class="card">
       <h3 style="font-size: 1.1rem; margin-bottom: 6px;">🔑 API Key 設定</h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted);">可貼上 OpenRouter Key (sk-or-...) 或正常的 Google Key</p>
-      <input type="text" id="api-key-input" placeholder="貼上 API Key">
+      <p style="font-size: 0.85rem; color: var(--text-muted);">請貼上 OpenRouter Key (sk-or-...)</p>
+      <input type="text" id="api-key-input" placeholder="貼上 OpenRouter API Key">
       <button class="btn-action" onclick="saveApiKey()">儲存並開始刷題</button>
     </div>
   </div>
@@ -108,49 +108,54 @@
         "explanation": "詳細觀念解析"
       }`;
 
-      try {
-        let res, textResult;
+      // OpenRouter 高可用免費模型清單
+      const freeModels = [
+        'google/gemini-2.0-flash-exp:free',
+        'google/gemini-2.0-flash-lite-preview:free',
+        'google/gemini-1.5-flash:free',
+        'meta-llama/llama-3.3-70b-instruct:free'
+      ];
 
-        // 判斷金鑰類型 (OpenRouter 或 Google)
-        if (apiKey.startsWith('sk-or-')) {
-          res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      let success = false;
+      let lastError = '';
+
+      for (const model of freeModels) {
+        try {
+          const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${apiKey}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              model: 'google/gemini-2.0-flash-001',
+              model: model,
               messages: [{ role: 'user', content: prompt }]
             })
           });
+
           const data = await res.json();
-          if (!res.ok) throw new Error(data.error?.message || 'OpenRouter 請求失敗');
-          textResult = data.choices[0].message.content;
-        } else {
-          res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { response_mime_type: "application/json" }
-            })
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error?.message || 'Google API 請求失敗');
-          textResult = data.candidates[0].content.parts[0].text;
+          if (!res.ok) throw new Error(data.error?.message || '模型響應失敗');
+
+          let textResult = data.choices[0].message.content;
+          textResult = textResult.replace(/```json/gi, '').replace(/```/g, '').trim();
+          currentQuestion = JSON.parse(textResult);
+
+          displayQuestion(currentQuestion);
+          success = true;
+          break; // 成功出題立刻跳出
+        } catch (err) {
+          console.warn(`模型 ${model} 暫無法使用，自動嘗試下一個...`, err.message);
+          lastError = err.message;
         }
+      }
 
-        textResult = textResult.replace(/```json/gi, '').replace(/```/g, '').trim();
-        currentQuestion = JSON.parse(textResult);
+      document.getElementById('loading').classList.add('hidden');
 
-        displayQuestion(currentQuestion);
+      if (success) {
         document.getElementById('quiz-card').classList.remove('hidden');
-      } catch (err) {
-        alert('出題失敗：' + err.message);
+      } else {
+        alert('出題失敗：' + lastError + '\n請檢查 OpenRouter API Key 是否複製完整！');
         document.getElementById('api-setting').classList.remove('hidden');
-      } finally {
-        document.getElementById('loading').classList.add('hidden');
       }
     }
 
@@ -189,10 +194,6 @@
       expBox.innerHTML = `<strong>💡 解析：</strong><br>${currentQuestion.explanation}`;
       expBox.classList.remove('hidden');
       document.getElementById('btn-next').classList.remove('hidden');
-    }
-  </script>
-</body>
-</html>
     }
   </script>
 </body>
