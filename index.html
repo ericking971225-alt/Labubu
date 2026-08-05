@@ -213,7 +213,7 @@
       } catch (e) {
         console.warn('動態抓取模型失敗，切換備用模型', e);
       }
-      return ['google/gemini-2.0-flash-exp:free', 'google/gemini-2.0-flash-lite-preview:free'];
+      return ['google/gemini-2.0-flash-exp:free'];
     }
 
     async function fetchQuestion() {
@@ -343,7 +343,6 @@
         // 可用於影像辨識的免費 AI 模型清單（備援機制）
         const visionModels = [
           'google/gemini-2.0-flash-exp:free',
-          'google/gemini-2.0-flash-lite-preview:free',
         ];
 
         let success = false;
