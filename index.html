@@ -163,7 +163,7 @@
         <div class="file-upload-btn" onclick="document.getElementById('custom-image').click()">
           點擊選擇圖片 / 拍照
         </div>
-        <input type="file" id="custom-image" class="hidden" accept="image/*" capture="environment" onchange="previewImage(event)">
+        <input type="file" id="custom-image" accept="image/*" onchange="previewImage(event)">
         <img id="image-preview" class="wrong-img hidden" src="" alt="預覽圖片">
       </div>
 
@@ -171,7 +171,7 @@
         <label>正確答案與觀念解析</label>
         <textarea id="custom-explanation" class="input-control" rows="3" placeholder="輸入正確答案與詳細觀念..."></textarea>
       </div>
-
+      <button id="save-btn" onclick="saveCustomWrong()" class="...">儲存錯題</button>
       <button class="btn-action" onclick="saveCustomWrong()">儲存至錯題本 💾</button>
       <button class="btn-action" style="background: #e2e8f0; color: #64748b; margin-top: 8px;" onclick="closeAddModal()">取消</button>
     </div>
@@ -179,6 +179,84 @@
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
  <script src="data.js"></script>
  <script>
+   let isSaving = false;
+
+function saveCustomWrong() {
+  // 1. 防止使用者連續快速點擊導致重複儲存
+  if (isSaving) return;
+
+  // 2. 取得輸入欄位資料
+  const subject = document.getElementById('custom-subject')?.value || '物理';
+  const question = document.getElementById('custom-question')?.value.trim();
+  const optionsA = document.getElementById('custom-opt-a')?.value || '';
+  const optionsB = document.getElementById('custom-opt-b')?.value || '';
+  const optionsC = document.getElementById('custom-opt-c')?.value || '';
+  const optionsD = document.getElementById('custom-opt-d')?.value || '';
+  const answer = document.getElementById('custom-answer')?.value || 'A';
+  const explanation = document.getElementById('custom-explanation')?.value || '';
+
+  // 3. 驗證：至少要有文字或圖片
+  if (!question && !currentImageBase64) {
+    alert("請至少輸入題目文字或上傳題目照片！");
+    return;
+  }
+
+  const saveBtn = document.getElementById('save-btn');
+
+  try {
+    // 進入儲存狀態，按鈕變更狀態
+    isSaving = true;
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerText = "儲存中...";
+    }
+
+    // 4. 讀取並更新 localStorage
+    const customList = JSON.parse(localStorage.getItem('customWrongBook') || '[]');
+    
+    const newEntry = {
+      id: 'custom_' + Date.now(),
+      subject: subject,
+      question: question,
+      options: { A: optionsA, B: optionsB, C: optionsC, D: optionsD },
+      answer: answer,
+      explanation: explanation,
+      image: currentImageBase64,
+      createdAt: new Date().toLocaleDateString()
+    };
+
+    customList.unshift(newEntry);
+    localStorage.setItem('customWrongBook', JSON.stringify(customList));
+
+    alert("成功新增錯題！");
+
+    // 5. ✅ 清空表單與預覽圖
+    resetCustomForm();
+
+    // 6. ✅ 自動關閉彈窗 (請確認你的 modal ID 是什麼，常見為 custom-modal 或 add-modal)
+    closeCustomModal();
+
+    // 7. ✅ 重新渲染錯題本畫面
+    if (typeof renderWrongBook === 'function') {
+      renderWrongBook();
+    }
+
+  } catch (error) {
+    console.error("儲存失敗：", error);
+    if (error.name === 'QuotaExceededError') {
+      alert("儲存失敗：照片檔案太大導致瀏覽器空間不足，請先清除部分舊錯題或選擇較小圖片！");
+    } else {
+      alert("儲存時發生錯誤：" + error.message);
+    }
+  } finally {
+    // 解除鎖定狀態，恢復按鈕
+    isSaving = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerText = "儲存錯題";
+    }
+  }
+}
 
     // ==========================================
     // 1. 100句不重複感性鼓勵語 (學測專屬)
