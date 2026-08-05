@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<!-- 1. MathJax 安全設定檔 (一定要在引入套件的上方) -->
 <script>
   window.MathJax = {
     tex: {
@@ -9,12 +8,12 @@
       displayMath: [['$$', '$$'], ['\\[', '\\]']]
     },
     startup: {
-      typeset: false // 告訴 MathJax 先不要自動渲染，交給我們用 JS 手動觸發
+      typeset: false // 告訴 MathJax 先不要自動排版，等我們用 JS 手動呼叫
     }
   };
 </script>
 
-<!-- 2. 引入套件 -->
+<!-- 2. ⚠️ 再放主程式：引入 MathJax 渲染引擎 -->
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -201,7 +200,6 @@
       <button class="btn-action" style="background: #e2e8f0; color: #64748b; margin-top: 8px;" onclick="closeAddModal()">取消</button>
     </div>
   </div>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
  <script src="data.js"></script>
  <script>
    // 重新排版畫面上的數學公式
@@ -217,7 +215,7 @@ function saveCustomWrong() {
   if (isSaving) return;
 
   // 2. 取得輸入欄位資料
-  const subject = document.getElementById('custom-subject')?.value || '物理';
+  const subject = document.getElementById('custom-subject')?.value || '';
   const question = document.getElementById('custom-question')?.value.trim();
   const optionsA = document.getElementById('custom-opt-a')?.value || '';
   const optionsB = document.getElementById('custom-opt-b')?.value || '';
