@@ -205,13 +205,16 @@
  <script src="data.js"></script>
  <script>
 function renderMath() {
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    // 重置 MathJax 狀態，確保它能重新掃描整個畫面
-    if (window.MathJax.texReset) window.MathJax.texReset();
-    
-    // 執行排版渲染
-    MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err));
-  }
+  // 讓程式稍微等 50 毫秒，確保 HTML 已經把題目文字確實印在畫面上
+  setTimeout(() => {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      // 1. 清除 MathJax 的舊記憶，強迫它重新看待整個網頁
+      MathJax.typesetClear();
+      
+      // 2. 重新掃描並把純文字變成數學公式
+      MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err));
+    }
+  }, 50);
 }
    let isSaving = false;
 
