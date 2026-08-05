@@ -125,6 +125,16 @@
       <div id="wrong-list-container"></div>
     </div>
 
+    <!-- 建議放在題目卡片內頂部的標籤區塊 -->
+<div class="flex justify-between items-center mb-3">
+  <span id="subject-tag" class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">物理</span>
+  
+  <!-- ⏱️ 新增計時器 display -->
+  <div class="flex items-center text-gray-600 font-mono text-sm bg-gray-100 px-3 py-1 rounded-full border">
+    <span>⏱️</span>
+    <span id="timer-text" class="ml-1 font-bold">00:00</span>
+  </div>
+</div>
   </div>
 
   <!-- 連勝獎勵彈窗 -->
@@ -257,7 +267,43 @@ function saveCustomWrong() {
     }
   }
 }
+// 全域計時器變數
+let timerInterval = null;
+let secondsElapsed = 0;
 
+// 1. 開始/重置計時器
+function startTimer() {
+  // 先停止先前的計時器，防止重複開多個計時器
+  stopTimer();
+
+  // 重置計時秒數
+  secondsElapsed = 0;
+  updateTimerDisplay();
+
+  // 每秒更新一次
+  timerInterval = setInterval(() => {
+    secondsElapsed++;
+    updateTimerDisplay();
+  }, 1000);
+}
+
+// 2. 停止計時器
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+// 3. 格式化時間 (分:秒) 並更新畫面
+function updateTimerDisplay() {
+  const timerElement = document.getElementById('timer-text');
+  if (!timerElement) return;
+
+  const minutes = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+  const seconds = (secondsElapsed % 60).toString().padStart(2, '0');
+  timerElement.innerText = `${minutes}:${seconds}`;
+}
     // ==========================================
     // 1. 100句不重複感性鼓勵語 (學測專屬)
     // ==========================================
@@ -406,6 +452,8 @@ function saveCustomWrong() {
     }
 
     function loadQuestion() {
+      startTimer();
+}
       if(filteredDB.length === 0) return;
       const randIndex = Math.floor(Math.random() * filteredDB.length);
       currentQuestion = filteredDB[randIndex];
@@ -427,7 +475,8 @@ function saveCustomWrong() {
       document.getElementById('q-explanation').classList.add('hidden');
       document.getElementById('btn-next').classList.add('hidden');
     }
-
+function checkAnswer(selectedOption) {
+  stopTimer();
     function checkAnswer(btn, selectedKey) {
       const options = document.querySelectorAll('.btn-option');
       options.forEach(opt => opt.onclick = null); // 鎖定作答
