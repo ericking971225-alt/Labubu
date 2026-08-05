@@ -1,6 +1,8 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+ <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" type="image/png" href="icon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>拉布</title>
@@ -11,17 +13,13 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#6366f1">
 
-  <!-- App 自訂桌面圖案 -->
-  <link rel="apple-touch-icon" href="icon.png">
-  <link rel="icon" type="image/png" href="icon.png">
-
   <style>
     :root {
       --primary: #6366f1;
       --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
       --bg-gradient: linear-gradient(180deg, #f0fdf4 0%, #e0f2fe 50%, #f3e8ff 100%);
-      --card-bg: rgba(255, 255, 255, 0.9);
-      --card-border: rgba(255, 255, 255, 0.7);
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(255, 255, 255, 0.8);
       --text-main: #0f172a;
       --text-muted: #64748b;
       --correct: #10b981;
@@ -32,7 +30,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: var(--bg-gradient); color: var(--text-main); min-height: 100vh; padding-bottom: 90px; }
-    header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(226, 232, 240, 0.8); position: sticky; top: 0; z-index: 20; }
+    header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(226, 232, 240, 0.8); position: sticky; top: 0; z-index: 20; }
     .app-title { font-size: 1.25rem; font-weight: 900; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .streak-badge { background: #fef3c7; color: #b45309; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15); }
     .container { max-width: 500px; margin: 0 auto; padding: 16px; }
@@ -54,11 +52,9 @@
     .btn-option.wrong { background: var(--wrong-bg); border-color: var(--wrong); color: #991b1b; font-weight: 700; }
     .explanation { margin-top: 20px; padding: 16px; background: rgba(241, 245, 249, 0.9); border-left: 4px solid var(--primary); border-radius: 12px; font-size: 0.95rem; line-height: 1.6; }
     .btn-action { width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 16px; border-radius: 16px; font-size: 1.05rem; font-weight: 700; cursor: pointer; margin-top: 16px; }
-    .btn-camera { background: linear-gradient(135deg, #10b981 0%, #059669 100%); margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-add { background: linear-gradient(135deg, #10b981 0%, #059669 100%); margin-bottom: 16px; margin-top: 0; }
     .btn-delete { background: #fee2e2; color: #ef4444; border: none; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; cursor: pointer; float: right; }
     
-    .loader-box { text-align: center; padding: 40px 20px; }
-    .spinner { width: 48px; height: 48px; border: 5px solid rgba(99, 102, 241, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; margin: 0 auto 16px auto; }
     .hidden { display: none !important; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 100; padding: 20px; }
@@ -67,14 +63,18 @@
     .modal-title { font-size: 1.3rem; font-weight: 900; color: #a855f7; margin-bottom: 12px; }
     .modal-msg { font-size: 1rem; line-height: 1.7; color: var(--text-main); margin-bottom: 24px; font-weight: 600; text-align: left; background: #f8fafc; padding: 16px; border-radius: 16px; border-left: 4px solid #a855f7; }
 
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .input-group { margin-bottom: 12px; text-align: left; }
+    .input-group label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+    .input-control { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem; outline: none; }
+    .input-control:focus { border-color: var(--primary); }
+
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="app-title">拉布</div>
+    <div class="app-title">拉布 </div>
     <div class="streak-badge" id="streak-count">🔥 連勝: 0</div>
   </header>
 
@@ -96,31 +96,20 @@
         <button class="subject-btn" onclick="selectSubject('地球科學', this)">🌍 地球科學</button>
       </div>
 
-      <div id="loading" class="card loader-box hidden">
-        <div class="spinner"></div>
-        <p style="font-weight: 700; color: var(--primary);" id="loading-text">Google AI 正在生成最新考題...</p>
-      </div>
-
-      <div id="quiz-card" class="card hidden">
+      <div id="quiz-card" class="card">
         <div id="q-badge" class="subject-badge">💡 自然科</div>
-        <div class="question-text" id="q-text"></div>
+        <div class="question-text" id="q-text">題目載入中...</div>
         <div class="options" id="q-options"></div>
         <div id="q-explanation" class="explanation hidden"></div>
-        <button id="btn-next" class="btn-action hidden" onclick="fetchQuestion()">下一題 ➔</button>
+        <button id="btn-next" class="btn-action hidden" onclick="nextQuestion()">下一題 ➔</button>
       </div>
     </div>
 
     <!-- 錯題本 View -->
     <div id="view-wrong" class="hidden">
-      <button class="btn-action btn-camera" onclick="document.getElementById('photo-input').click()">
-        🖼️ 選擇照片 / 📷 拍照分析錯題
+      <button class="btn-action btn-add" onclick="openAddModal()">
+        ✍️ 手動新增自訂錯題 / 筆記
       </button>
-      <input type="file" id="photo-input" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
-
-      <div id="wrong-loading" class="card loader-box hidden">
-        <div class="spinner"></div>
-        <p style="font-weight: 700; color: #059669;" id="wrong-loading-text">Google AI 正在分析考題圖片...</p>
-      </div>
 
       <div id="wrong-list-container"></div>
     </div>
@@ -137,17 +126,1018 @@
     </div>
   </div>
 
-  <script>
-    // 🔑 已填入你的 Google AI Studio API Key
-    const EMBEDDED_API_KEY = "AQ.Ab8RN6LD4QcqsWulXRypr6mRC8w_mclSwEHjTkyaiSCAHcRU6w";
+  <!-- 新增錯題彈窗 -->
+  <div id="add-modal" class="modal-overlay hidden">
+    <div class="modal-card" style="text-align: left;">
+      <div class="modal-title" style="text-align: center;">✍️ 新增錯題筆記</div>
+      
+      <div class="input-group">
+        <label>科目</label>
+        <select id="custom-subject" class="input-control">
+          <option value="物理">物理</option>
+          <option value="化學">化學</option>
+          <option value="生物">生物</option>
+          <option value="地球科學">地球科學</option>
+        </select>
+      </div>
 
-    let currentQuestion = null;
+      <div class="input-group">
+        <label>題目內容</label>
+        <textarea id="custom-question" class="input-control" rows="3" placeholder="輸入題目敘述..."></textarea>
+      </div>
+
+      <div class="input-group">
+        <label>正確答案與觀念解析</label>
+        <textarea id="custom-explanation" class="input-control" rows="3" placeholder="輸入正確答案與詳細觀念..."></textarea>
+      </div>
+
+      <button class="btn-action" onclick="saveCustomWrong()">儲存至錯題本 💾</button>
+      <button class="btn-action" style="background: #e2e8f0; color: #64748b; margin-top: 8px;" onclick="closeAddModal()">取消</button>
+    </div>
+  </div>
+
+  <script>
+    // 📚 內建 108 課綱學測自然科高品質題庫
+    const database = [
+     // ================= ⚡ 物理 (20 題) =================
+      {
+        subject: "物理",
+        question: "一物體在水平面上作直線運動，其速度與時間關係圖（v-t 圖）為一條斜率不為零的直線，則此物體的運動狀態為何？",
+        options: { A: "靜止", B: "等速度運動", C: "等加速度運動", D: "變加速度運動" },
+        answer: "C",
+        explanation: "v-t 圖（速度-時間圖）的『斜率』代表加速度。斜率為常數的斜直線表示加速度保持不變，即為等加速度運動。"
+      },
+      {
+        subject: "物理",
+        question: "關於牛頓第一運動定律（慣性定律），下列敘述何者正確？",
+        options: {
+          A: "物體不受外力作用時，一定保持靜止",
+          B: "公車突然煞車時，乘客身體向前傾斜是慣性的表現",
+          C: "運動中的物體若要維持運動，必須持續施加外力",
+          D: "慣性的大小由物體的速度決定"
+        },
+        answer: "B",
+        explanation: "慣性是指物體維持原本運動狀態的特性。公車煞車時乘客因慣性維持向前的運動而前傾。慣性的大小僅由『質量』決定。"
+      },
+      {
+        subject: "物理",
+        question: "質量為 2 kg 的物體受到 10 N 的合力作用，若不計摩擦力，該物體的加速度大小為多少 m/s²？",
+        options: { A: "2", B: "5", C: "10", D: "20" },
+        answer: "B",
+        explanation: "根據牛頓第二運動定律 $F = ma$，帶入數據：$10 = 2 \times a \implies a = 5\text{ m/s}^2$。"
+      },
+      {
+        subject: "物理",
+        question: "關於作用力與反作用力（牛頓第三定律），下列敘述何者正確？",
+        options: {
+          A: "作用力與反作用力作用在同一物體上，可以互相抵銷",
+          B: "划船時用槳向後撥水，水給槳向前的推力使船前進",
+          C: "只有當物體靜止時，作用力才等於反作用力",
+          D: "作用力發生後，反作用力才會延遲產生"
+        },
+        answer: "B",
+        explanation: "作用力與反作用力大小相等、方向相反，且『同時發生』並『作用在不同物體上』，因此絕對不可互相抵銷。"
+      },
+      {
+        subject: "物理",
+        question: "若兩質點間的距離變為原來的 2 倍，且兩質點的質量均不變，則兩者間的萬有引力變為原來的多少倍？",
+        options: { A: "2 倍", B: "4 倍", C: "1/2 倍", D: "1/4 倍" },
+        answer: "D",
+        explanation: "萬有引力大小與距離平方成反比（$F \propto 1/r^2$）。距離變為 2 倍，萬有引力變為 $1/2^2 = 1/4$ 倍。"
+      },
+      {
+        subject: "物理",
+        question: "將質量 1 kg 的物體由地面垂直向上拋出，已知拋出瞬間的動能為 100 J，不計空氣阻力（g = 10 m/s²），物體可達到的最大高度為多少公尺？",
+        options: { A: "5", B: "10", C: "20", D: "50" },
+        answer: "B",
+        explanation: "由力學能守恆，最高點的重力位能等於拋出時的動能：$mgh = 100 \implies 1 \times 10 \times h = 100 \implies h = 10\text{ m}$。"
+      },
+      {
+        subject: "物理",
+        question: "關於功與能量的敘述，下列何者正確？",
+        options: {
+          A: "施力方向與物體位移方向垂直時，施力對物體作正功",
+          B: "摩擦力對物體運動總是作負功",
+          C: "動能的大小與物體的速度成正比",
+          D: "功的單位焦耳（J）是向量"
+        },
+        answer: "B",
+        explanation: "摩擦力方向常與物體相對運動方向相反，故多作負功。垂直位移不作功；動能 $E_k = \frac{1}{2}mv^2$ 與速度『平方』成正比；功是純量。"
+      },
+      {
+        subject: "物理",
+        question: "關於電場與庫侖定律，下列敘述何者正確？",
+        options: {
+          A: "同性電荷互相吸引，異性電荷互相排斥",
+          B: "靜電力的大小與兩點電荷電量的乘積成正比",
+          C: "庫侖定律適用於任何形狀的帶電體，無須考慮距離",
+          D: "電場線可以相交"
+        },
+        answer: "B",
+        explanation: "庫侖定律公式 $F = \frac{k q_1 q_2}{r^2}$，靜電力與電量乘積成正比、距離平方成反比。同性相斥異性相吸，電場線不可相交。"
+      },
+      {
+        subject: "物理",
+        question: "一電熱器接在 110 V 的電源上，通過的電流為 5 A，則該電熱器的消耗功率為多少瓦特（W）？",
+        options: { A: "22", B: "110", C: "550", D: "2200" },
+        answer: "C",
+        explanation: "電功率公式 $P = V \times I$。帶入數據：$P = 110\text{ V} \times 5\text{ A} = 550\text{ W}$。"
+      },
+      {
+        subject: "物理",
+        question: "利用安培右手定則可以判斷下列哪一種物理現象？",
+        options: {
+          A: "長直導線通電時所產生的磁場方向",
+          B: "感應電流帶來的阻礙力方向",
+          C: "光波的偏振方向",
+          D: "核反應釋放的能量大小"
+        },
+        answer: "A",
+        explanation: "安培右手定則用於判斷通電導線（電流）在其周圍產生的『電流磁效應』磁場方向。"
+      },
+      {
+        subject: "物理",
+        question: "發電機主要是利用下列哪一種物理原理來發電？",
+        options: { A: "電流熱效應", B: "靜電感應", C: "法拉第電磁感應", D: "光電效應" },
+        answer: "C",
+        explanation: "發電機利用線圈在磁場中轉動產生磁通量變化，透過『法拉第電磁感應』將機械能轉化為電能。"
+      },
+      {
+        subject: "物理",
+        question: "一繩波波速為 20 m/s，若頻率為 5 Hz，則此繩波的波長為多少公尺？",
+        options: { A: "0.25", B: "4", C: "25", D: "100" },
+        answer: "B",
+        explanation: "波速公式 $v = f \times \lambda$。帶入數據：$20 = 5 \times \lambda \implies \lambda = 4\text{ m}$。"
+      },
+      {
+        subject: "物理",
+        question: "關於聲波與電磁波的比較，下列敘述何者正確？",
+        options: {
+          A: "聲波是縱波，電磁波是橫波",
+          B: "兩者皆可在真空中傳播",
+          C: "聲波傳播速度比電磁波快",
+          D: "聲波屬於電磁波的一種"
+        },
+        answer: "A",
+        explanation: "聲波需要介質（為力學波/縱波），無法在真空中傳播；電磁波不需要介質（為橫波），真空中速率高達光速。"
+      },
+      {
+        subject: "物理",
+        question: "當光線由水中斜射入空氣中時，折射角與入射角的關係為何？",
+        options: {
+          A: "折射角小於入射角",
+          B: "折射角等於入射角",
+          C: "折射角大於入射角",
+          D: "不發生折射，只會直接穿透"
+        },
+        answer: "C",
+        explanation: "光由光密介質（水）進入光疏介質（空氣）時，折射光線偏離法線，因此『折射角大於入射角』。"
+      },
+      {
+        subject: "物理",
+        question: "下列電磁波中，頻率最高、波長最短的是哪一種？",
+        options: { A: "無線電波", B: "紅外線", C: "可見光", D: "伽瑪射線（$\gamma$ 射線）" },
+        answer: "D",
+        explanation: "電磁波頻率由高至低順序為：伽瑪射線 > X 射線 > 紫外線 > 可見光 > 紅外線 > 微波 > 無線電波。頻率越高，波長越短。"
+      },
+      {
+        subject: "物理",
+        question: "愛因斯坦提出『光電效應』，成功解釋了光具有下列哪一種性質？",
+        options: { A: "波動性", B: "粒子性", C: "繞射性", D: "干涉性" },
+        answer: "B",
+        explanation: "光電效應證實光子具有能量不連續的『粒子性』；而干涉與繞射現象則證實光的『波動性』。"
+      },
+      {
+        subject: "物理",
+        question: "核能發電廠目前採用的主要核反應方式為何？",
+        options: { A: "核分裂", B: "核融合", C: "α 衰變", D: "β 衰變" },
+        answer: "A",
+        explanation: "目前的商業核能發電是利用重核（如鈾-235）吸收中子後發生的『核分裂』連鎖反應；太陽內部則是進行『核融合』。"
+      },
+      {
+        subject: "物理",
+        question: "自然界中的四種基本交互作用中，作用距離極短且強度最強的是哪一種？",
+        options: { A: "重力交互作用", B: "電磁交互作用", C: "強核力交互作用", D: "弱核力交互作用" },
+        answer: "C",
+        explanation: "強核力（強作用力）負責將質子與中子束縛在原子核內，強度最強但作用距離僅限於原子核尺度（約 $10^{-15}\text{ m}$）。"
+      },
+      {
+        subject: "物理",
+        question: "宇宙學中，天文學家觀測遠方星系的光譜發現『紅移』現象，這代表什麼物理意義？",
+        options: {
+          A: "遠方星系正在向我們靠近",
+          B: "遠方星系正在離我們遠去，宇宙正在膨脹",
+          C: "遠方星系的溫度極低",
+          D: "遠方星系是由純氫氣組成的"
+        },
+        answer: "B",
+        explanation: "多普勒效應表明，光源離我們遠去時波長變長（紅移）。遠方星系普遍紅移證明『宇宙正在膨脹』。"
+      },
+      {
+        subject: "物理",
+        question: "熱量傳遞的三種方式（傳導、對流、輻射）中，哪一種方式不需要任何介質即可進行？",
+        options: { A: "傳導", B: "對流", C: "輻射", D: "三者皆需要介質" },
+        answer: "C",
+        explanation: "輻射（如太陽光傳到地球）是以電磁波形式傳播熱量，完全不需要任何介質。"
+      },
+
+      // ================= 🧪 化學 (20 題) =================
+      {
+        subject: "化學",
+        question: "下列何者屬於『純物質』？",
+        options: { A: "空氣", B: "蒸餾水", C: "鹽水", D: "黃銅" },
+        answer: "B",
+        explanation: "蒸餾水由單一化合物（$H_2O$）組成，屬於純物質；空氣、鹽水、黃銅（銅鋅合金）皆為混合物。"
+      },
+      {
+        subject: "化學",
+        question: "欲將墨水中的彩色色素成分進行分離，最適當且簡便的實驗方法為何？",
+        options: { A: "結晶法", B: "過濾法", C: "紙層析法", D: "蒸餾法" },
+        answer: "C",
+        explanation: "紙層析法利用混合物中各成分對濾紙（固定相）與展開液（流動相）附著力的差異，能有效分離少量色素。"
+      },
+      {
+        subject: "化學",
+        question: "阿伏伽德羅數（$6.02 \times 10^{23}$）代表的意義為何？",
+        options: {
+          A: "1 克任何物質所含的分子數",
+          B: "1 莫耳任何粒子所含的粒子數量",
+          C: "1 公升氣體所含的分子數",
+          D: "原子核內的質子數"
+        },
+        answer: "B",
+        explanation: "莫耳（mole）是物質量的單位，1 莫耳即含有 $6.02 \times 10^{23}$ 個粒子（稱為阿伏伽德羅常數）。"
+      },
+      {
+        subject: "化學",
+        question: "水的化學式為 $H_2O$，已知氫的原子量為 1，氧的原子量為 16，則 36 克的純水含有多少莫耳的水分子？",
+        options: { A: "1", B: "2", C: "3", D: "18" },
+        answer: "B",
+        explanation: "水的分子量為 $1 \times 2 + 16 = 18\text{ g/mol}$。莫耳數 $= \text{質量} / \text{分子量} = 36 / 18 = 2\text{ 莫耳}$。"
+      },
+      {
+        subject: "化學",
+        question: "關於元素週期表的規律性，下列敘述何者正確？",
+        options: {
+          A: "同週期元素具有相同價電子數",
+          B: "同族元素具有相似的化學性質",
+          C: "週期表是按照元素的原子量由小到大排列",
+          D: "金屬元素大多位於週期表的右上角"
+        },
+        answer: "B",
+        explanation: "同族元素擁有相同的價電子數，故化學性質相似。現代週期表是以『原子序（質子數）』排列；金屬多在左下角。"
+      },
+      {
+        subject: "化學",
+        question: "食鹽（NaCl）晶體主要是透過下列哪一種化學鍵結合而成的？",
+        options: { A: "離子鍵", B: "共價鍵", C: "金屬鍵", D: "氫鍵" },
+        answer: "A",
+        explanation: "鈉金屬原子失去電子形成 $\text{Na}^+$，氯非金屬原子得到電子形成 $\text{Cl}^-$，兩者透過靜電吸引力形成『離子鍵』。"
+      },
+      {
+        subject: "化學",
+        question: "將 20 克的糖完全溶解於 80 克的水中，則此糖水的『質量百分濃度』為多少？",
+        options: { A: "20%", B: "25%", C: "80%", D: "100%" },
+        answer: "A",
+        explanation: "質量百分濃度 $= [\text{溶質} / (\text{溶質} + \text{溶劑})] \times 100\% = [20 / (20 + 80)] \times 100\% = 20\%$。"
+      },
+      {
+        subject: "化學",
+        question: "大多數固體溶質（如硝酸鉀）在水中的溶解度，通常會隨溫度升高如何變化？",
+        options: { A: "增加", B: "減少", C: "保持不變", D: "先減後增" },
+        answer: "A",
+        explanation: "大多數固體溶解過程為吸熱，溫度升高有利於溶解，故溶解度增加；氣體則相反，溫度越高溶解度越低。"
+      },
+      {
+        subject: "化學",
+        question: "在 25°C 下，某一水溶液的 pH 值為 3，則此溶液的性質為何？",
+        options: { A: "強鹼性", B: "弱鹼性", C: "中性", D: "酸性" },
+        answer: "D",
+        explanation: "在 25°C 時，pH < 7 為酸性，pH = 7 為中性，pH > 7 為鹼性。pH 值越小，酸性越強。"
+      },
+      {
+        subject: "化學",
+        question: "酚酞指示劑滴入下列哪一種溶液中會顯現出『粉紅色』？",
+        options: { A: "檸檬汁", B: "純水", C: "氫氧化鈉水溶液", D: "鹽酸溶液" },
+        answer: "C",
+        explanation: "酚酞在酸性及中性溶液中呈無色，在鹼性溶液（如 NaOH）中會呈粉紅色。"
+      },
+      {
+        subject: "化學",
+        question: "在氧化還原反應中，關於『氧化劑』的敘述何者正確？",
+        options: {
+          A: "自身發生氧化反應",
+          B: "在反應中失去電子",
+          C: "使其他物質發生氧化反應，自身被還原",
+          D: "價數（氧化數）上升"
+        },
+        answer: "C",
+        explanation: "氧化劑『氧化別人，還原自己』。因此氧化劑本身在反應中『獲得電子』，發生還原反應。"
+      },
+      {
+        subject: "化學",
+        question: "金屬鐵在空氣中生銹是常見的氧化反應，下列哪一種方法『無法』防止鐵生銹？",
+        options: {
+          A: "在鐵製品表面塗漆或抹油",
+          B: "鍍上一層耐腐蝕的金屬（如鋅或鉻）",
+          C: "將鐵製品浸泡在鹽水中",
+          D: "製成不銹鋼（加入鎳、鉻合金）"
+        },
+        answer: "C",
+        explanation: "鹽水中的電解質會加速鐵的電化學腐蝕（生銹），因此將鐵浸泡在鹽水中會更快速生銹。"
+      },
+      {
+        subject: "化學",
+        question: "關於催化劑（觸媒）對化學反應的影響，下列敘述何者正確？",
+        options: {
+          A: "能增加反應物的生成總量",
+          B: "能降低反應的活化能，從而加快反應速率",
+          C: "在反應前後自身的質量與化學性質會改變",
+          D: "會改變反應熱（$\Delta H$）的大小"
+        },
+        answer: "B",
+        explanation: "催化劑透過提供新反應途徑『降低活化能』來加速反應，但不會改變反應熱（$\Delta H$）、不改變平衡常數，反應前後自身不變。"
+      },
+      {
+        subject: "化學",
+        question: "已知反應 $N_2 + 3H_2 \rightleftharpoons 2NH_3 + \text{熱}$ 已達平衡，若增加系統壓力，平衡將如何移動？",
+        options: { A: "向右（生成物方向）移動", B: "向左（反應物方向）移動", C: "不移動", D: "無法判斷" },
+        answer: "A",
+        explanation: "根據勒沙特列原理，加壓時系統會向『氣體莫耳數較少』的方向移動以減壓。左側有 $1+3=4$ 莫耳氣體，右側有 $2$ 莫耳氣體，故向右移動。"
+      },
+      {
+        subject: "化學",
+        question: "有機化合物中含有官能基『$-OH$』的家族稱為：",
+        options: { A: "有機酸類", B: "醇類", C: "酯類", D: "醛類" },
+        answer: "B",
+        explanation: "含有羥基（$-OH$）的有機物稱為醇類（如乙醇 $C_2H_5OH$）；含有 carboxyl group（$-COOH$）則為有機酸類。"
+      },
+      {
+        subject: "化學",
+        question: "日常常見的聚乙烯（PE）寶特瓶與塑膠袋屬於哪一類聚合物？",
+        options: {
+          A: "熱固性聚合物（網狀結構）",
+          B: "熱塑性聚合物（鏈狀結構）",
+          C: "天然無機聚合物",
+          D: "蛋白質類聚合物"
+        },
+        answer: "B",
+        explanation: "PE 為鏈狀結構的『熱塑性聚合物』，加熱後可軟化塑形並回收再利用。"
+      },
+      {
+        subject: "化學",
+        question: "下列哪一種烴類屬於『飽和烴』，且分子式通式為 $C_n H_{2n+2}$？",
+        options: { A: "烷類", B: "烯類", C: "炔類", D: "芳香烴" },
+        answer: "A",
+        explanation: "烷類分子內碳與碳之間均為單鍵，稱為『飽和烴』，通式為 $C_n H_{2n+2}$（如甲烷 $CH_4$、丙烷 $C_3H_8$）。"
+      },
+      {
+        subject: "化學",
+        question: "構成生物體蛋白質的基本重複單位（單體）為何？",
+        options: { A: "葡萄糖", B: "脂肪酸", C: "氨基酸", D: "核苷酸" },
+        answer: "C",
+        explanation: "蛋白質是由許多『氨基酸』透過肽鍵脫水縮合形成的高分子聚合物。"
+      },
+      {
+        subject: "化學",
+        question: "造成全球『酸雨』現象的主要大氣污染物氣體包含下列何者？",
+        options: { A: "二氧化碳與甲烷", B: "二氧化硫與氮氧化物", C: "氟氯碳化物", D: "一氧化碳" },
+        answer: "B",
+        explanation: "工廠及車輛排放的二氧化硫（$SO_2$）與氮氧化物（$NO_x$）溶於雨水中會形成硫酸與硝酸，造成酸雨。"
+      },
+      {
+        subject: "化學",
+        question: "智慧型手機與電動車廣泛使用的『鋰電池』，在分類上屬於下列哪一種？",
+        options: { A: "一次電池（不可充電）", B: "二次電池（可重複充電）", C: "燃料電池", D: "物理電池" },
+        answer: "B",
+        explanation: "二次電池（如鋰電池、鉛蓄電池）是指放電後可以透過反向通電進行充電、重複使用的化學電池。"
+      },
+
+      // ================= 🧬 生物 (20 題) =================
+      {
+        subject: "生物",
+        question: "真核細胞中，負責進行有氧呼吸並產生大量 ATP 能量的『能量工廠』胞器為何？",
+        options: { A: "核糖體", B: "高基氏體", C: "線粒體", D: "溶體" },
+        answer: "C",
+        explanation: "線粒體是真核細胞進行有氧呼吸的主要場所，可將有機物氧化分解產生 ATP 能量供細胞使用。"
+      },
+      {
+        subject: "生物",
+        question: "細胞膜主要由雙層脂質構成，物質通過細胞膜時，若『不需要消耗 ATP 能量』且順著濃度梯度移動，稱為：",
+        options: { A: "主動運輸", B: "被動運輸（被動擴散）", C: "胞吞作用", D: "胞吐作用" },
+        answer: "B",
+        explanation: "被動運輸（擴散作用、便利擴散）順濃度梯度進行，不需要消耗 ATP；主動運輸則逆濃度梯度且需消耗 ATP。"
+      },
+      {
+        subject: "生物",
+        question: "酵素（生物催化劑）主要由蛋白質組成，下列關於酵素特性的敘述何者正確？",
+        options: {
+          A: "酵素在高溫（如 100°C）下活性會永久失去（變性）",
+          B: "一種酵素可以催化任何化學反應，沒有專一性",
+          C: "酵素在反應過程中會被大量消耗",
+          D: "酵素只能在細胞內發揮作用"
+        },
+        answer: "A",
+        explanation: "高溫會破壞蛋白質的高級結構使酵素『變性』失去活性。酵素具有高度專一性，且反應前後質量不變可重複使用。"
+      },
+      {
+        subject: "生物",
+        question: "植物進行光合作用的『光反應』階段，主要在葉綠體的哪一個結構進行，並會釋放哪一種氣體？",
+        options: {
+          A: "基質；二氧化碳",
+          B: "葉綠餅（類囊體）；氧氣",
+          C: "線粒體；水蒸氣",
+          D: "細胞核；氮氣"
+        },
+        answer: "B",
+        explanation: "光反應在類囊體薄膜上進行，利用光能吸收水分子並將其光解，產生能量（ATP、NADPH）與釋放『氧氣』。"
+      },
+      {
+        subject: "生物",
+        question: "與有氧呼吸相比，人體肌肉細胞在劇烈運動缺氧時進行的『無氧呼吸（發酵作用）』會產生哪一種累積物質？",
+        options: { A: "酒精", B: "乳酸", C: "檸檬酸", D: "醋酸" },
+        answer: "B",
+        explanation: "人體骨骼肌在高度缺氧時，糖解作用產生的丙酮酸會進行乳酸發酵，生成『乳酸』導致肌肉酸痛。"
+      },
+      {
+        subject: "生物",
+        question: "體細胞進行『有絲分裂』與生殖細胞進行『減數分裂』的比較，下列何者正確？",
+        options: {
+          A: "有絲分裂產生 4 個子細胞，染色體數減半",
+          B: "減數分裂過程中會發生同源染色體複製與分離，使染色體數減半",
+          C: "有絲分裂是人類產生精子與卵子的主要方式",
+          D: "減數分裂後的子細胞染色體數與母細胞完全相同"
+        },
+        answer: "B",
+        explanation: "減數分裂進行兩次分裂，產生 4 個染色體數減半（n）的配子；有絲分裂則產生 2 個染色體數不變（2n）的體細胞。"
+      },
+      {
+        subject: "生物",
+        question: "孟德爾遺傳法則中，基因型為 AaBb 的個體（兩基因獨立分配），自行授粉後代（F2）的表現型比例為多少？",
+        options: { A: "1:1:1:1", B: "3:1", C: "9:3:3:1", D: "1:2:1" },
+        answer: "C",
+        explanation: "根據獨立分配律，雙雜交異型合子（AaBb）自交後代表現型比例呈現典型的 9 : 3 : 3 : 1。"
+      },
+      {
+        subject: "生物",
+        question: "人類的『紅綠色盲』屬於 X 染色體隱性性聯遺傳。若父親表現正常，母親為色盲帶因者（Heterozygous），其所生的『兒子』罹患色盲的機率為何？",
+        options: { A: "0%", B: "25%", C: "50%", D: "100%" },
+        answer: "C",
+        explanation: "兒子從父親獲得 Y 染色體，從母親獲得 X 染色體。母親為帶因者（$X^B X^b$），兒子有 50% 機率獲得隱性基因 $X^b$ 而患病。"
+      },
+      {
+        subject: "生物",
+        question: "分子生物學中心法則（Central Dogma）中，從 DNA 轉錄成 RNA，再將 RNA 轉譯為蛋白質的場所分別為何？",
+        options: {
+          A: "皆在細胞核內",
+          B: "轉錄在細胞核，轉譯在細胞質（核糖體）",
+          C: "轉錄在線粒體，轉譯在高基氏體",
+          D: "皆在細胞質內"
+        },
+        answer: "B",
+        explanation: "真核細胞中，DNA 在『細胞核』內轉錄成 mRNA，mRNA 隨後輸出至『細胞質』與核糖體結合進行蛋白質轉譯。"
+      },
+      {
+        subject: "生物",
+        question: "基因工程中常用於切割特定 DNA 序列的『分子剪刀』工具稱為：",
+        options: { A: "DNA 連接酶", B: "限制酶", C: "聚合酶", D: "解旋酶" },
+        answer: "B",
+        explanation: "限制酶（Restriction Enzymes）能識別專一的 DNA 序列並精確進行切割，是基因重組技術的核心工具。"
+      },
+      {
+        subject: "生物",
+        question: "人體消化系統中，食物營養素（如葡萄糖、氨基酸、脂肪酸）主要進行消化與吸收的最主要器官為何？",
+        options: { A: "胃", B: "小腸", C: "大腸", D: "食道" },
+        answer: "B",
+        explanation: "小腸擁有極大的表面積（絨毛與微絨毛），且有胰液、膽汁、腸液注入，是人體消化與吸收最主要的器官。"
+      },
+      {
+        subject: "生物",
+        question: "關於人體血液循環系統的血管特性，下列敘述何者正確？",
+        options: {
+          A: "動脈管壁最薄，是物質交換的場所",
+          B: "靜脈內多設有瓣膜，防止血液倒流",
+          C: "微血管血流速度最快",
+          D: "肺動脈裡面流動的是富含氧氣的鮮紅色血液"
+        },
+        answer: "B",
+        explanation: "靜脈血壓低，管腔內有瓣膜防止倒流；微血管管壁最薄且血流最慢，利於物質交換；肺動脈流動的是『缺氧血』。"
+      },
+      {
+        subject: "生物",
+        question: "人體免疫系統中，能產生專一性抗體以進行『體液免疫』反應的細胞為何？",
+        options: { A: "B 細胞（B 淋巴球）", B: "T 細胞（T 淋巴球）", C: "紅血球", D: "血小板" },
+        answer: "A",
+        explanation: "B 細胞分化為漿細胞後可分泌『抗體』進行體液免疫；T 細胞則負責胞器傳遞與胞毒作用（細胞免疫）。"
+      },
+      {
+        subject: "生物",
+        question: "當手不小心碰到熱鍋時會迅速縮回（縮手反射），此一膝跳或縮手反射的神經傳導路徑不需經過下列哪一個中樞處理？",
+        options: { A: "脊髓", B: "感覺神經元", C: "大腦皮質", D: "運動神經元" },
+        answer: "C",
+        explanation: "反射動作為了爭取時間，由『脊髓』直接作決策控制肌肉縮回，不需等待大腦意識思考處理。"
+      },
+      {
+        subject: "生物",
+        question: "當人體處於飢餓狀態血糖濃度降低時，胰臟會分泌哪一種激素以促進肝糖分解提升血糖？",
+        options: { A: "胰島素", B: "升糖素", C: "甲狀腺素", D: "褪黑激素" },
+        answer: "B",
+        explanation: "血糖過低時，胰島 $\alpha$ 細胞分泌『升糖素』促使肝糖分解；血糖過高時，$\beta$ 細胞分泌『胰島素』促進細胞吸收血糖。"
+      },
+      {
+        subject: "生物",
+        question: "植物體內『水分與無機鹽』的運輸主要依靠哪一種組織？其主要的動力來源為何？",
+        options: {
+          A: "韌皮部；主動運輸",
+          B: "木質部；蒸散作用形成的拉力",
+          C: "形成層；光合作用壓力",
+          D: "表皮組織；重力"
+        },
+        answer: "B",
+        explanation: "水分與礦物質由『木質部』向上運輸，主要靠葉片氣孔『蒸散作用』所產生的巨大負壓拉力拉動。"
+      },
+      {
+        subject: "生物",
+        question: "將植物幼苗放在單側光照射下，幼苗會朝向光線方向生長（向光性），這是因為哪一種植物激素在背光側濃度較高所致？",
+        options: { A: "生長素（Auxin）", B: "離層酸", C: "乙烯", D: "吉貝素" },
+        answer: "A",
+        explanation: "單側光使生長素移動至『背光側』，背光側細胞濃度高而生長伸長較快，導致莖彎向光源。"
+      },
+      {
+        subject: "生物",
+        question: "在生態系的能量金字塔中，能量由低營養階層傳遞至高營養階層時，平均只有約多少比例的能量可被轉化儲存？",
+        options: { A: "1%", B: "10%", C: "50%", D: "90%" },
+        answer: "B",
+        explanation: "根據生態學『10% 定律』，能量轉移效率平均約僅 10%，其餘 90% 皆透過呼吸作用散失或隨排泄物浪費。"
+      },
+      {
+        subject: "生物",
+        question: "生物多樣性（Biodiversity）包含三個主要涵蓋層面，下列何者『不包含』在內？",
+        options: { A: "遺傳（基因）多樣性", B: "物種多樣性", C: "生態系多樣性", D: "人口個數多樣性" },
+        answer: "D",
+        explanation: "生物多樣性三大階層為：基因（遺傳）多樣性、物種多樣性、以及生態系多樣性。"
+      },
+      {
+        subject: "生物",
+        question: "達爾文提出『天擇說』解釋物種演化，天擇說的核心觀念不包含下列何者？",
+        options: { A: "過度繁殖", B: "生存競爭", C: "器官用進廢退", D: "適者生存" },
+        answer: "C",
+        explanation: "『用進廢退說』是由拉馬克提出的（且已被證實不符合遺傳學）；達爾文的天擇說核心為：個體變異 $\to$ 過度繁殖 $\to$ 生存競爭 $\to$ 適者生存。"
+      },
+
+      // ================= 🌍 地球科學 (20 題) =================
+      {
+        subject: "地球科學",
+        question: "大氣層垂直分層中，大部分的天氣現象（如降雨、雲、霧、颱風）主要發生在哪一層？",
+        options: { A: "對流層", B: "平流層", C: "中氣層", D: "熱氣層（增溫層）" },
+        answer: "A",
+        explanation: "對流層集中了大氣約 80% 的質量與幾乎全部的水氣，且氣流對流旺盛，因此所有天氣現象皆在此層發生。"
+      },
+      {
+        subject: "地球科學",
+        question: "在北半球，由於地球自轉產生的『科氏力』影響，會使水平運動的風向朝向運動方向的哪一側偏轉？",
+        options: { A: "左側", B: "右側", C: "上方", D: "不偏轉" },
+        answer: "B",
+        explanation: "科氏力偏向效果：北半球向『右』偏轉，南半球向『左』偏轉，赤道上科氏力為零。"
+      },
+      {
+        subject: "地球科學",
+        question: "當冷氣團主動向暖氣團推進，並強行抬升暖空氣時所形成的鋒面稱為：",
+        options: { A: "暖鋒", B: "冷鋒", C: "滯留鋒", D: "囚固鋒" },
+        answer: "B",
+        explanation: "冷氣團推進推擠暖空氣抬升為『冷鋒』，常帶來陣雨與劇烈降溫；雨區主要集中在鋒後。"
+      },
+      {
+        subject: "地球科學",
+        question: "生成颱風（熱帶氣旋）的基本環境條件中，海面水溫通常需要達到多少度以上？",
+        options: { A: "10°C", B: "18°C", C: "26.5°C", D: "35°C" },
+        answer: "C",
+        explanation: "颱風主要依靠熱帶洋面大量水氣凝結釋放的潛熱為能量來源，海水表面溫度需高於約 26.5°C。"
+      },
+      {
+        subject: "地球科學",
+        question: "當聖嬰現象（El Niño）發生時，赤道太平洋地區會出現下列哪種異常大氣與海洋變化？",
+        options: {
+          A: "東信風增強",
+          B: "赤道東太平洋（秘魯附近）海水溫度異常升高",
+          C: "西太平洋海面水溫異常升高",
+          D: "秘魯漁場湧升流異常增強"
+        },
+        answer: "B",
+        explanation: "聖嬰年東信風減弱，暖水向東蔓延，使赤道東太平洋海溫異常升高，湧升流受阻，秘魯漁場產量大減。"
+      },
+      {
+        subject: "地球科學",
+        question: "海洋海水平均鹽度約為 35‰（千分之 35），溶解於海水中含量最高的離子分別為何？",
+        options: { A: "鈣離子與碳酸根", B: "鈉離子與氯離子", C: "鎂離子與硫酸根", D: "鉀離子與溴離子" },
+        answer: "B",
+        explanation: "海水中含量最豐富的溶質是氯化鈉（食鹽），因此最主要的離子為『氯離子』與『鈉離子』。"
+      },
+      {
+        subject: "地球科學",
+        question: "當太陽、地球與月球排成一直線時（新月或滿月），會出現哪一種潮汐現象？",
+        options: { A: "大潮（潮差最大）", B: "小潮（潮差最小）", C: "無潮", D: "海嘯" },
+        answer: "A",
+        explanation: "日、地、月連成一直線時，太陽與月球的引潮力疊加，會形成滿潮最高、乾潮最低的『大潮』。"
+      },
+      {
+        subject: "地球科學",
+        question: "地球內部分層（地殼、地函、地核）中，主要由液態鐵、鎳金屬構成，且被認為是地球磁場來源的是哪一層？",
+        options: { A: "大陸地殼", B: "上部地函", C: "外地核", D: "內地核" },
+        answer: "C",
+        explanation: "S 波無法穿透『外地核』證實其為液態。液態金屬外核的對流與流動產生了發電機效應，形成地球磁場。"
+      },
+      {
+        subject: "地球科學",
+        question: "全球的大洋中脊（如大西洋洋中脊）屬於下列哪一種板塊邊界類型？",
+        options: { A: "張裂型板塊邊界", B: "聚合型板塊邊界", C: "錯動型板塊邊界", D: "穩定理性邊界" },
+        answer: "A",
+        explanation: "洋中脊是熱地函物質上升、兩側板塊拉開分開的『張裂型邊界』，會源源不絕湧出玄武岩岩漿形成新海洋地殼。"
+      },
+      {
+        subject: "地球科學",
+        question: "關於地震波 P 波與 S 波的特性比較，下列敘述何者正確？",
+        options: {
+          A: "S 波傳播速度比 P 波快",
+          B: "P 波是縱波，可以在固體與液體中傳播",
+          C: "S 波可以穿透液態的外地核",
+          D: "P 波會引發最嚴重的地表破壞"
+        },
+        answer: "B",
+        explanation: "P 波（初波）為縱波，傳播速度最快且可通過固、液、氣體；S 波（剪力波/橫波）較慢，且『無法通過液體』。"
+      },
+      {
+        subject: "地球科學",
+        question: "臺灣花蓮太魯閣以壯麗的峽谷聞名，其岩石主要是由石灰岩經過高溫高壓變質而成的：",
+        options: { A: "玄武岩", B: "花崗岩", C: "大理岩", D: "安山岩" },
+        answer: "C",
+        explanation: "太魯閣峽谷由『大理岩』組成，大理岩是沉積岩（石灰岩）在高溫高壓下變質形成的變質岩。"
+      },
+      {
+        subject: "地球科學",
+        question: "在地層未受倒轉的正常情況下，下方地層年代較老、上方地層年代較新，此原則稱為：",
+        options: { A: "地層疊置定律", B: "截切關係定律", C: "化石順序定律", D: "均變理論" },
+        answer: "A",
+        explanation: "地層疊置定律指未受劇烈地質構造變動干擾時，先沉積的地層在下（較老），後沉積的在上（較新）。"
+      },
+      {
+        subject: "地球科學",
+        question: "欲測定含有有機骨骼或木炭遺骸的『近幾萬年內』地質年代，最常用的放射性同位素為：",
+        options: { A: "鈾-238", B: "碳-14（C-14）", C: "鉀-40", D: "銣-87" },
+        answer: "B",
+        explanation: "碳-14 的半衰期約 5730 年，適合用於測定約 5 萬年以內的生物遺骸絕對年代。"
+      },
+      {
+        subject: "地球科學",
+        question: "太陽系八大行星中，類地行星（如地球、火星）與類木行星（如木星、土星）相比，類地行星的特徵為何？",
+        options: {
+          A: "體積巨大，密度極低",
+          B: "主要由氣體與冰組成",
+          C: "平均密度較大，主要由岩石與金屬組成",
+          D: "擁有龐大的環系統與數十顆衛星"
+        },
+        answer: "C",
+        explanation: "類地行星（水、金、地、火）距離太陽近，體積小、質量小，但密度大（由岩石金屬構成）；類木行星則體積大、密度小。"
+      },
+      {
+        subject: "地球科學",
+        question: "若在臺灣（北緯 23.5°）觀察夜空，北極星在天空中的仰角約為多少度？",
+        options: { A: "0°", B: "23.5°", C: "66.5°", D: "90°" },
+        answer: "B",
+        explanation: "在北半球任何地點觀測北極星的仰角，數值上恆等於『當地北緯緯度』。臺灣北緯 23.5°，故仰角即為 23.5°。"
+      },
+      {
+        subject: "地球科學",
+        question: "天體赫羅圖（H-R Diagram）中，絕大多數恆星（包含太陽）一生中約 90% 時間停留的序列稱為：",
+        options: { A: "主序星", B: "紅巨星", C: "白矮星", D: "超新星" },
+        answer: "A",
+        explanation: "恆星在核心穩定進行氫融合反應時稱為『主序星』，太陽目前就是一顆穩定的主序星。"
+      },
+      {
+        subject: "地球科學",
+        question: "太陽表面溫度較低（約 4000 K）、磁場極強而呈現暗黑色的區域稱為：",
+        options: { A: "日冕", B: "耀斑", C: "太陽黑子", D: "日珥" },
+        answer: "C",
+        explanation: "太陽黑子是光球層上磁場特別強烈的區域，抑制了對流，使溫度比周圍光球（約 6000 K）低而顯得較暗。"
+      },
+      {
+        subject: "地球科學",
+        question: "當發生『日全食』天象時，此時月球的月相必為下列何者？",
+        options: { A: "新月（朔）", B: "上弦月", C: "滿月（望）", D: "下弦月" },
+        answer: "A",
+        explanation: "日食發生時，月球必須位於太陽與地球之間擋住陽光，此時月相必定為農曆初一的『新月（朔）』。"
+      },
+      {
+        subject: "地球科學",
+        question: "哈伯定律 $v = H_0 d$ 說明遠方星系的退行速度與距離成正比，這項天文學發現直接支持了下列哪一個理論？",
+        options: { A: "地心說", B: "太陽系形成星雲說", C: "宇宙大爆炸理論", D: "恆星穩態理論" },
+        answer: "C",
+        explanation: "哈伯定律證實宇宙空間正在均勻膨脹，回溯過去宇宙必定退回至一個極高溫極高密度的點，支持了『大爆炸理論』。"
+      },
+      {
+        subject: "地球科學",
+        question: "沿海地區如果過度過量抽取地下水，最容易引發下列哪一種環境災害？",
+        options: { A: "地盤下陷與海水倒灌", B: "火山爆發", C: "土石流", D: "酸雨" },
+        answer: "A",
+        explanation: "過度抽取地下水會使地下地層孔隙水壓降低、地層壓密，進而導致嚴重的地盤下陷與沿海海水倒灌、土地鹽化。"
+      }
+      { subject: "物理", question: "一物體在水平面上作直線運動，其速度與時間關係圖（v-t 圖）為一條斜率不為零的直線，則此物體的運動狀態為何？", options: { A: "靜止", B: "等速度運動", C: "等加速度運動", D: "變加速度運動" }, answer: "C", explanation: "v-t 圖的斜率代表加速度。斜率為常數的斜直線表示加速度保持不變，即為等加速度運動。" },
+      { subject: "物理", question: "關於牛頓第一運動定律（慣性定律），下列敘述何者正確？", options: { A: "物體不受外力作用時，一定保持靜止", B: "公車突然煞車時，乘客身體向前傾斜是慣性的表現", C: "運動中的物體若要維持運動，必須持續施加外力", D: "慣性的大小由物體的速度決定" }, answer: "B", explanation: "慣性是物體維持原本運動狀態的特性。公車煞車時乘客因慣性維持向前運動而前傾。慣性大小僅由『質量』決定。" },
+      { subject: "物理", question: "質量為 2 kg 的物體受到 10 N 的合力作用，若不計摩擦力，該物體的加速度大小為多少 m/s²？", options: { A: "2", B: "5", C: "10", D: "20" }, answer: "B", explanation: "根據牛頓第二運動定律 F = ma，帶入數據：10 = 2 × a ⟹ a = 5 m/s²。" },
+      { subject: "物理", question: "關於作用力與反作用力（牛頓第三定律），下列敘述何者正確？", options: { A: "作用力與反作用力作用在同一物體上，可以互相抵銷", B: "划船時用槳向後撥水，水給槳向前的推力使船前進", C: "只有當物體靜止時，作用力才等於反作用力", D: "作用力發生後，反作用力才會延遲產生" }, answer: "B", explanation: "作用力與反作用力大小相等、方向相反、同時發生，且『作用在不同物體上』，因此絕對無法抵銷。" },
+      { subject: "物理", question: "若兩質點間的距離變為原來的 2 倍，且兩質點的質量均不變，則兩者間的萬有引力變為原來的多少倍？", options: { A: "2 倍", B: "4 倍", C: "1/2 倍", D: "1/4 倍" }, answer: "D", explanation: "萬有引力大小與距離平方成反比。距離變為 2 倍，萬有引力變為 1/4 倍。" },
+      { subject: "物理", question: "將質量 1 kg 的物體由地面垂直向上拋出，已知拋出瞬間的動能為 100 J，不計空氣阻力（g = 10 m/s²），物體可達到的最大高度為多少公尺？", options: { A: "5", B: "10", C: "20", D: "50" }, answer: "B", explanation: "由力學能守恆，最高點的重力位能等於拋出時的動能：mgh = 100 ⟹ 1 × 10 × h = 100 ⟹ h = 10 m。" },
+      { subject: "物理", question: "關於功與能量的敘述，下列何者正確？", options: { A: "施力方向與物體位移方向垂直時，施力對物體作正功", B: "滑動摩擦力對物體相對運動通常作負功", C: "動能的大小與物體的速度成正比", D: "功的單位焦耳（J）是向量" }, answer: "B", explanation: "摩擦力方向與物體相對運動方向相反，故作負功。垂直位移不作功；動能與速度『平方』成正比；功是純量。" },
+      { subject: "物理", question: "關於電場與庫侖定律，下列敘述何者正確？", options: { A: "同性電荷互相吸引，異性電荷互相排斥", B: "靜電力的大小與兩點電荷電量的乘積成正比", C: "庫侖定律不適用於點電荷", D: "電場線可以相交" }, answer: "B", explanation: "庫侖定律指出靜電力與電量乘積成正比、距離平方成反比。同性相斥異性相吸，電場線不可相交。" },
+      { subject: "物理", question: "一電熱器接在 110 V 的電源上，通過的電流為 5 A，則該電熱器的消耗功率為多少瓦特（W）？", options: { A: "22", B: "110", C: "550", D: "2200" }, answer: "C", explanation: "電功率公式 P = V × I ⟹ P = 110 V × 5 A = 550 W。" },
+      { subject: "物理", question: "利用安培右手定則可以判斷下列哪一種物理現象？", options: { A: "長直導線通電時所產生的磁場方向", B: "感應電流帶來的阻礙力方向", C: "光波的偏振方向", D: "核反應釋放的能量大小" }, answer: "A", explanation: "安培右手定則用於判斷通電導線（電流）在其周圍產生的磁場方向。" },
+      { subject: "物理", question: "發電機主要是利用下列哪一種物理原理來發電？", options: { A: "電流熱效應", B: "靜電感應", C: "法拉第電磁感應", D: "光電效應" }, answer: "C", explanation: "發電機利用線圈在磁場中轉動產生磁通量變化，透過法拉第電磁感應將機械能轉化為電能。" },
+      { subject: "物理", question: "一繩波波速為 20 m/s，若頻率為 5 Hz，則此繩波的波長為多少公尺？", options: { A: "0.25", B: "4", C: "25", D: "100" }, answer: "B", explanation: "波速公式 v = f × λ ⟹ 20 = 5 × λ ⟹ λ = 4 m。" },
+      { subject: "物理", question: "關於聲波與電磁波的比較，下列敘述何者正確？", options: { A: "聲波是縱波，電磁波是橫波", B: "兩者皆可在真空中傳播", C: "聲波傳播速度比電磁波快", D: "聲波屬於電磁波的一種" }, answer: "A", explanation: "聲波需要介質（為縱波），無法在真空中傳播；電磁波不需要介質（為橫波），真空中速率為光速。" },
+      { subject: "物理", question: "當光線由水中斜射入空氣中時，折射角與入射角的關係為何？", options: { A: "折射角小於入射角", B: "折射角等於入射角", C: "折射角大於入射角", D: "不發生折射" }, answer: "C", explanation: "光由光密介質（水）進入光疏介質（空氣）時，折射光線偏離法線，折射角大於入射角。" },
+      { subject: "物理", question: "下列電磁波中，頻率最高、波長最短的是哪一種？", options: { A: "無線電波", B: "紅外線", C: "可見光", D: "伽瑪射線（γ 射線）" }, answer: "D", explanation: "電磁波頻率越高波長越短，順序：伽瑪射線 > X 射線 > 紫外線 > 可見光 > 紅外線 > 微波 > 無線電波。" },
+      { subject: "物理", question: "愛因斯坦提出『光電效應』，成功解釋了光具有下列哪一種性質？", options: { A: "波動性", B: "粒子性", C: "繞射性", D: "干涉性" }, answer: "B", explanation: "光電效應證實光具有能量不連續的『粒子性』；干涉與繞射則證實光的『波動性』。" },
+      { subject: "物理", question: "目前商業核能發電廠採用的主要核反應方式為何？", options: { A: "核分裂", B: "核融合", C: "α 衰變", D: "β 衰變" }, answer: "A", explanation: "核能發電廠是利用重核（如鈾-235）吸收中子發生的『核分裂』連鎖反應；太陽內部則是核融合。" },
+      { subject: "物理", question: "自然界四種基本交互作用中，作用距離極短且強度最強的是哪一種？", options: { A: "重力", B: "電磁力", C: "強核力", D: "弱核力" }, answer: "C", explanation: "強核力負責將質子與中子束縛在原子核內，強度最強但作用距離僅限於原子核尺度（約 10⁻¹⁵ m）。" },
+      { subject: "物理", question: "天文學家觀測遠方星系光譜發現『紅移』現象，代表什麼物理意義？", options: { A: "星系向我們靠近", B: "星系正在離我們遠去，宇宙正在膨脹", C: "星系溫度極低", D: "星系由純氫組成" }, answer: "B", explanation: "多普勒效應中光源遠離時波長變長（紅移）。遠方星系普遍紅移證明宇宙正在膨脹。" },
+      { subject: "物理", question: "熱量傳遞方式（傳導、對流、輻射）中，哪一種不需要任何介質即可進行？", options: { A: "傳導", B: "對流", C: "輻射", D: "三者皆需要" }, answer: "C", explanation: "輻射（如太陽光傳到地球）是以電磁波形式傳播熱量，完全不需要任何介質。" },
+      { subject: "物理", question: "車子由靜止出發作等加速度運動，第 1 秒內位移為 2 m，則第 2 秒內（第 1 秒末至第 2 秒末）的位移為多少公尺？", options: { A: "2", B: "4", C: "6", D: "8" }, answer: "C", explanation: "初速為零的等加速度運動，各連續相等時間內的位移比為 1 : 3 : 5 : 7...。故第 2 秒內位移為 2 × 3 = 6 m。" },
+      { subject: "物理", question: "自由落體運動（不計空氣阻力）中，物體的質量變為 2 倍時，下落的加速度將如何變化？", options: { A: "變為 2 倍", B: "變為 1/2 倍", C: "保持不變", D: "變為 4 倍" }, answer: "C", explanation: "自由落體加速度為重力加速度 g，與物體質量大小無關。" },
+      { subject: "物理", question: "從高樓水平拋出一小球，若不計空氣阻力，小球在水平方向與鉛直方向分別作何種運動？", options: { A: "水平等速，鉛直等速", B: "水平等加速度，鉛直等速", C: "水平等速，鉛直自由落體", D: "水平等加速度，鉛直等加速度" }, answer: "C", explanation: "平拋運動在水平方向不受力作『等速度運動』，鉛直方向僅受重力作『自由落體運動』。" },
+      { subject: "物理", question: "關於動摩擦力的大小，下列敘述何者正確？", options: { A: "與物體運動速度成正比", B: "與接觸面間的正向力成正比", C: "與接觸面積成正比", D: "隨外力增加而增加" }, answer: "B", explanation: "動摩擦力 f = μN，大小與正向力 N 成正比，與接觸面積及運動速度無關。" },
+      { subject: "物理", question: "將一彈簧拉長 x 公分時，儲存的彈性位能為 E。若將該彈簧拉長 2x 公分，儲存的彈性位能變為多少？", options: { A: "E", B: "2E", C: "4E", D: "8E" }, answer: "C", explanation: "彈性位能 U = 1/2 k x²，與形變量 x 的平方成正比。形變量變為 2 倍，位能變為 2² = 4 倍。" },
+      { subject: "物理", question: "一系統若不受任何外力作用（合外力為零），則該系統的何種物理量必保持守恆？", options: { A: "動能", B: "總動量", C: "機械能", D: "速度" }, answer: "B", explanation: "動量守恆定律：系統所受合外力為零時，系統的總動量保持不變。" },
+      { subject: "物理", question: "歐姆定律中，導體兩端的電壓（V）與通過的電流（I）及電阻（R）關係為何？", options: { A: "V = I / R", B: "V = I × R", C: "R = V × I", D: "I = V × R" }, answer: "B", explanation: "歐姆定律公式為 V = IR。" },
+      { subject: "物理", question: "將兩個相同的電阻串聯連接，其總電阻與並聯連接時的總電阻相比，串聯總電阻是並聯總電阻的幾倍？", options: { A: "1", B: "2", C: "4", D: "1/4" }, answer: "C", explanation: "設電阻為 R。串聯總電阻為 2R；並聯總電阻為 R/2。2R ÷ (R/2) = 4 倍。" },
+      { subject: "物理", question: "變壓器主要利用哪一種電流型態才能進行升壓或降壓？", options: { A: "直流電", B: "交流电", C: "靜電", D: "脈動直流電" }, answer: "B", explanation: "變壓器利用『交流電』產生的變動磁場進行電磁感應；若輸入直流電則無法產生磁通量變化。" },
+      { subject: "物理", question: "冷次定律主要用於判斷感應電流的方向，其核心觀念是感應電流產生的磁場會如何？", options: { A: "順應原磁場變化", B: "阻礙原磁場磁通量的變化", C: "增強原磁場強度", D: "垂直於原磁場" }, answer: "B", explanation: "冷次定律指出：感應電流的磁場方向總是『阻礙』穿過線圈的磁通量發生變化。" },
+      { subject: "物理", question: "雙狹縫干涉實驗成功證明了光具有波動性質，狹縫間距變小，屏上的干涉條紋間距會如何變化？", options: { A: "變寬", B: "變窄", C: "不變", D: "消失" }, answer: "A", explanation: "干涉條紋間距 Δy = λL / d。狹縫間距 d 減小，條紋間距 Δy 會變寬。" },
+      { subject: "物理", question: "光發生『全反射』現象必須滿足的條件為何？", options: { A: "光由光疏介質射入光密介質，且入射角大於臨界角", B: "光由光密介質射入光疏介質，且入射角大於臨界角", C: "入射角等於零度", D: "折射角等於零度" }, answer: "B", explanation: "全反射必須光由『光密進入光疏』，且『入射角大於臨界角』時才會發生。" },
+      { subject: "物理", question: "近視眼患者眼睛無法將遠處物體的像清晰聚焦在視網膜上，應佩戴何種透鏡矯正？", options: { A: "凸透鏡", B: "凹透鏡", C: "平面鏡", D: "雙焦點凸透鏡" }, answer: "B", explanation: "近視眼成像在視網膜前方，需佩戴具有發散光線作用的『凹透鏡』來矯正。" },
+      { subject: "物理", question: "凸透鏡成像中，若物體置於焦點與透鏡之間（物距 < 焦距），所成的像為何？", options: { A: "倒立縮小實像", B: "倒立放大實像", C: "正立放大虛像", D: "正立縮小虛像" }, answer: "C", explanation: "物距小於焦距時，凸透鏡可作放大鏡使用，成『正立放大虛像』。" },
+      { subject: "物理", question: "決定樂音『音調高低』的主要物理量為何？", options: { A: "振幅", B: "頻率", C: "波形", D: "響度" }, answer: "B", explanation: "音調高低由『頻率』決定；響度（大小聲）由『振幅』決定；音色由『波形』決定。" },
+      { subject: "物理", question: "當救護車鳴笛開過你身旁並遠離時，你聽到的笛聲頻率會如何變化？（多普勒效應）", options: { A: "變高", B: "變低", C: "保持不變", D: "先高後低再高" }, answer: "B", explanation: "當波源遠離觀察者時，波長被拉長，接收到的頻率會『變低』。" },
+      { subject: "物理", question: "人類耳朵能聽到的聲波頻率範圍大約為何？", options: { A: "0 ~ 20 Hz", B: "20 ~ 20000 Hz", C: "20000 ~ 200000 Hz", D: "無限制" }, answer: "B", explanation: "人耳聽覺範圍約為 20 Hz 至 20000 Hz。低於 20 Hz 稱為次聲波，高於 20000 Hz 稱為超聲波。" },
+      { subject: "物理", question: "熱力學第一定律本質上是哪一種物理基本定律在熱學上的體現？", options: { A: "動量守恆定律", B: "能量守恆定律", C: "質量守恆定律", D: "電荷守恆定律" }, answer: "B", explanation: "熱力學第一定律（ΔU = Q - W）本質上就是能量守恆定律。" },
+      { subject: "物理", question: "將 100 g、100°C 的熱水與 100 g、20°C 的冷水混合，若不計熱量散失，平衡溫度為多少°C？", options: { A: "40", B: "50", C: "60", D: "80" }, answer: "C", explanation: "相同物質與質量混合，平衡溫度為兩者平均值：(100 + 20) / 2 = 60°C。" },
+      { subject: "物理", question: "理想氣體狀態方程式 PV = nRT 中，T 代表什麼溫標？", options: { A: "攝氏溫標（°C）", B: "華氏溫標（°F）", C: "絕對溫標（K）", D: "任意溫標皆可" }, answer: "C", explanation: "氣體定律中的溫度 T 必須使用絕對溫標（開爾文，K）。" },
+      { subject: "物理", question: "法國物理學家德布羅意提出『物質波』假說，指出運動中的微觀粒子具有什麼性質？", options: { A: "僅有粒子性", B: "僅有波動性", C: "波粒二象性", D: "放射性" }, answer: "C", explanation: "德布羅意指出所有物質粒子（如電子）都具有波動性，即具有『波粒二象性』。" },
+      { subject: "物理", question: "玻爾原子模型成功解釋了哪一種元素的原子發射光譜不連續現象？", options: { A: "氫原子", B: "氦原子", C: "碳原子", D: "鐵原子" }, answer: "A", explanation: "玻爾提出量子化軌道模型，成功解釋了單電子系統『氫原子』的光譜線。" },
+      { subject: "物理", question: "太陽內部能源源不絕釋放巨大能量，主要進行的是哪一種核反應？", options: { A: "鈾-235 分裂", B: "氫核融合", C: "碳衰變", D: "鐵分裂" }, answer: "B", explanation: "太陽核心在高溫高壓下進行『氫核融合』反應生成氦，並釋放巨大能量。" },
+      { subject: "物理", question: "某放射性同位素的半衰期為 4 年，若初始質量為 80 克，8 年後剩餘質量為多少克？", options: { A: "40", B: "20", C: "10", D: "5" }, answer: "B", explanation: "8 年經過了 2 個半衰期。剩餘量 = 80 × (1/2)² = 20 克。" },
+      { subject: "物理", question: "愛因斯坦質能相當方程式 E = mc² 中，c 代表什麼物理量？", options: { A: "比熱", B: "真空中光速", C: "庫侖常數", D: "聲速" }, answer: "B", explanation: "E = mc² 中，c 代表真空中光速（約 3 × 10⁸ m/s）。" },
+      { subject: "物理", question: "原子核發生 β 衰變時，主要是由哪一種基本交互作用所支配？", options: { A: "重力", B: "電磁力", C: "強核力", D: "弱核力" }, answer: "D", explanation: "弱核力（弱作用力）支配了原子核的 β 衰變過程。" },
+      { subject: "物理", question: "帶電粒子在均勻磁場中垂直於磁場方向運動時，粒子受到的磁力使其作何種運動？", options: { A: "等加速度直線運動", B: "等速率圓周運動", C: "拋物線運動", D: "靜止" }, answer: "B", explanation: "勞侖茲力方向始終垂直於運動速度，只改變速度方向不改變大小，作『等速率圓周運動』。" },
+      { subject: "物理", question: "海森堡提出『測不準原理』，指出我們無法同時精確測量微觀粒子的何種物理量組合？", options: { A: "質量與電荷", B: "位置與動量", C: "能量與質量", D: "時間與溫度" }, answer: "B", explanation: "測不準原理表明：無法同時精確測量粒子的『位置』與『動量』。" },
+      { subject: "物理", question: "滑冰選手在旋轉時將原本張開的雙臂收攏至胸前，旋轉角速度會變快，這是利用哪一種守恆律？", options: { A: "動量守恆", B: "角動量守恆", C: "能量守恆", D: "質量守恆" }, answer: "B", explanation: "收攏雙臂減小了轉動慣量 I，由角動量守恆 L = Iω，角速度 ω 隨之增大。" },
+      { subject: "物理", question: "兩物體發生『完全彈性碰撞』時，下列何種物理量在碰撞前後保持不變？", options: { A: "僅總動量", B: "僅總動能", C: "總動量與總動能均保持不變", D: "各自的速度" }, answer: "C", explanation: "完全彈性碰撞的定義就是碰撞前後『總動量』與『總動能』皆守恆。" },
+
+      // ================= 🧪 化學 (50 題) =================
+      { subject: "化學", question: "下列何者屬於『純物質』？", options: { A: "空氣", B: "蒸餾水", C: "鹽水", D: "黃銅" }, answer: "B", explanation: "蒸餾水為單一化合物（H₂O），屬純物質；其餘皆為混合物。" },
+      { subject: "化學", question: "欲將墨水中的彩色色素成分進行分離，最適當且簡便的實驗方法為何？", options: { A: "結晶法", B: "過濾法", C: "紙層析法", D: "蒸餾法" }, answer: "C", explanation: "紙層析法利用各成分對濾紙與展開液附著力差異，可有效分離少量色素。" },
+      { subject: "化學", question: "阿伏伽德羅數（6.02 × 10²³）代表的意義為何？", options: { A: "1 克任何物質所含分子數", B: "1 莫耳任何粒子所含粒子數量", C: "1 公升氣體所含分子數", D: "質子數" }, answer: "B", explanation: "1 莫耳（mole）即含有 6.02 × 10²³ 個粒子。" },
+      { subject: "化學", question: "水的化學式為 H₂O，已知 H=1, O=16，則 36 克的純水含有多少莫耳水分子？", options: { A: "1", B: "2", C: "3", D: "18" }, answer: "B", explanation: "水分子量為 18 g/mol。莫耳數 = 36 / 18 = 2 莫耳。" },
+      { subject: "化學", question: "關於元素週期表的規律性，下列敘述何者正確？", options: { A: "同週期元素價電子數相同", B: "同族元素具有相似化學性質", C: "按原子量由小到大排列", D: "金屬元素大多位於右上角" }, answer: "B", explanation: "同族元素擁有相同的價電子數，故化學性質相似。" },
+      { subject: "化學", question: "食鹽（NaCl）晶體主要是透過下列哪一種化學鍵結合而成的？", options: { A: "離子鍵", B: "共價鍵", C: "金屬鍵", D: "氫鍵" }, answer: "A", explanation: "Na⁺ 與 Cl⁻ 透過靜電吸引力形成離子鍵。" },
+      { subject: "化學", question: "將 20 克的糖完全溶解於 80 克的水中，則此糖水的『質量百分濃度』為多少？", options: { A: "20%", B: "25%", C: "80%", D: "100%" }, answer: "A", explanation: "質量百分濃度 = [20 / (20 + 80)] × 100% = 20%。" },
+      { subject: "化學", question: "大多數固體溶質（如硝酸鉀）在水中的溶解度，通常會隨溫度升高如何變化？", options: { A: "增加", B: "減少", C: "保持不變", D: "先減後增" }, answer: "A", explanation: "固體溶解多為吸熱過程，溫度升高有利於溶解，故溶解度增加。" },
+      { subject: "化學", question: "在 25°C 下，某一水溶液的 pH 值為 3，則此溶液的性質為何？", options: { A: "強鹼性", B: "弱鹼性", C: "中性", D: "酸性" }, answer: "D", explanation: "25°C 下，pH < 7 為酸性，數值越小酸性越強。" },
+      { subject: "化學", question: "酚酞指示劑滴入下列哪一種溶液中會顯現出『粉紅色』？", options: { A: "檸檬汁", B: "純水", C: "氫氧化鈉水溶液", D: "鹽酸溶液" }, answer: "C", explanation: "酚酞在鹼性溶液（如 NaOH）中呈粉紅色，酸性及中性無色。" },
+      { subject: "化學", question: "在氧化還原反應中，關於『氧化劑』的敘述何者正確？", options: { A: "自身發生氧化", B: "在反應中失去電子", C: "使其他物質發生氧化，自身被還原", D: "氧化數上升" }, answer: "C", explanation: "氧化劑『氧化別人，還原自己』，反應中獲得電子。" },
+      { subject: "化學", question: "金屬鐵在空氣中生銹是氧化反應，下列哪一種方法『無法』防止鐵生銹？", options: { A: "塗漆抹油", B: "鍍上鋅金屬", C: "浸泡在鹽水中", D: "製成不銹鋼" }, answer: "C", explanation: "鹽水電解質會加速鐵的電化學腐蝕，使其更快生銹。" },
+      { subject: "化學", question: "關於催化劑（觸媒）對化學反應的影響，下列敘述何者正確？", options: { A: "增加生成總量", B: "降低活化能，加快反應速率", C: "自身質量改變", D: "改變反應熱" }, answer: "B", explanation: "催化劑透過降低活化能來加速反應，不改變反應熱與生成總量。" },
+      { subject: "化學", question: "已知 N₂ + 3H₂ ⇌ 2NH₃ 已達平衡，若增加系統壓力，平衡將如何移動？", options: { A: "向右（生成物方向）", B: "向左（反應物方向）", C: "不移動", D: "無法判斷" }, answer: "A", explanation: "加壓時系統向氣體莫耳數較少方向（右側 2 莫耳）移動。" },
+      { subject: "化學", question: "有機化合物中含有官能基『-OH』的家族稱為：", options: { A: "有機酸類", B: "醇類", C: "酯類", D: "醛類" }, answer: "B", explanation: "含有羥基（-OH）的有機物稱為醇類。" },
+      { subject: "化學", question: "日常常見的聚乙烯（PE）塑膠袋屬於哪一類聚合物？", options: { A: "熱固性聚合物", B: "熱塑性聚合物", C: "天然無機聚合物", D: "蛋白質" }, answer: "B", explanation: "PE 為鏈狀結構的熱塑性聚合物，加熱可軟化塑形。" },
+      { subject: "化學", question: "下列哪一種烴類屬於『飽和烴』，且分子式通式為 CₙH₂ₙ₊₂？", options: { A: "烷類", B: "烯類", C: "炔類", D: "芳香烴" }, answer: "A", explanation: "烷類碳碳間均為單鍵，屬飽和烴，通式 CₙH₂ₙ₊₂。" },
+      { subject: "化學", question: "構成生物體蛋白質的基本重複單體為何？", options: { A: "葡萄糖", B: "脂肪酸", C: "氨基酸", D: "核苷酸" }, answer: "C", explanation: "蛋白質是由許多氨基酸透過肽鍵縮合形成的高分子。" },
+      { subject: "化學", question: "造成全球『酸雨』現象的主要大氣污染物氣體包含下列何者？", options: { A: "CO₂ 與 CH₄", B: "SO₂ 與氮氧化物", C: "CFCs", D: "CO" }, answer: "B", explanation: "SO₂ 與 NOₓ 溶於雨水形成硫酸與硝酸造成酸雨。" },
+      { subject: "化學", question: "智慧型手機與電動車廣泛使用的『鋰電池』屬於哪一種？", options: { A: "一次電池", B: "二次電池", C: "燃料電池", D: "物理電池" }, answer: "B", explanation: "二次電池是指可重複充電使用的化學電池。" },
+      { subject: "化學", question: "金剛石（鑽石）與石墨皆由碳原子構成但性質差異巨大，兩者互為何種關係？", options: { A: "同分異構物", B: "同素異形體", C: "同位素", D: "同系物" }, answer: "B", explanation: "由同種元素組成但結構排列不同的單質稱為『同素異形體』。" },
+      { subject: "化學", question: "乙醇（C₂H₅OH）與甲醚（CH₃OCH₃）分子式相同但結構不同，互為何種關係？", options: { A: "同分異構物", B: "同素異形體", C: "同位素", D: "同系物" }, answer: "A", explanation: "分子式相同但原子連結方式與結構不同的化合物稱為『同分異構物』。" },
+      { subject: "化學", question: "二氧化碳（CO₂）分子中，碳與氧原子之間主要是透過何種化學鍵結合？", options: { A: "離子鍵", B: "共價鍵", C: "金屬鍵", D: "氫鍵" }, answer: "B", explanation: "非金屬與非金屬原子間透過共用電子對形成『共價鍵』。" },
+      { subject: "化學", question: "將 0.5 莫耳的氫氧化鈉（NaOH）溶於水調配成 2 公升水溶液，體積莫耳濃度為多少 M？", options: { A: "0.25", B: "0.5", C: "1.0", D: "2.0" }, answer: "A", explanation: "體積莫耳濃度 M = 溶質莫耳數 / 溶液總體積(L) = 0.5 / 2 = 0.25 M。" },
+      { subject: "化學", question: "當光線照射膠體溶液時能觀察到一條光亮的通路，此現象稱為：", options: { A: "布朗運動", B: "丁達爾效應", C: "電泳現象", D: "滲透壓" }, answer: "B", explanation: "膠體粒子分散膠體中散射光線形成的強光通路稱為『丁達爾效應』。" },
+      { subject: "化學", question: "下列哪一種物質的水溶液『無法』導電（非電解質）？", options: { A: "食鹽", B: "蔗糖", C: "氯化氫", D: "氫氧化鉀" }, answer: "B", explanation: "蔗糖為分子化合物，溶於水不解離出自由離子，屬於非電解質。" },
+      { subject: "化學", question: "根據阿瑞尼斯酸鹼定義，酸性物質在水溶液中解離必會產生何種離子？", options: { A: "OH⁻", B: "H⁺（氫離子）", C: "Na⁺", D: "Cl⁻" }, answer: "B", explanation: "阿瑞尼斯酸定義為在水溶液中能解離出 H⁺ 的物質。" },
+      { subject: "化學", question: "強酸與強鹼發生中和反應生成鹽和水，此反應本質上為何種熱反應？", options: { A: "吸熱反應", B: "放熱反應", C: "不吸熱也不放熱", D: "視溫度而定" }, answer: "B", explanation: "酸鹼中和屬於『放熱反應』，會使溶液溫度上升。" },
+      { subject: "化學", question: "高錳酸鉀（KMnO₄）中，錳（Mn）元素的氧化數為何？", options: { A: "+2", B: "+4", C: "+6", D: "+7" }, answer: "D", explanation: "K為+1，O為-2。1 + Mn + 4(-2) = 0 ⟹ Mn = +7。" },
+      { subject: "化學", question: "金屬活性順序中，下列哪一種金屬活性最強，最容易氧化失去電子？", options: { A: "鉀（K）", B: "鐵（Fe）", C: "銅（Cu）", D: "金（Au）" }, answer: "A", explanation: "金屬活性順序：K > Ca > Na > Mg > Al > Zn > Fe...，鉀活性最強。" },
+      { subject: "化學", question: "鋅銅電池放電時，鋅片作為負極發生的反應為何？", options: { A: "鋅原子失去電子發生氧化", B: "鋅離子獲得電子發生還原", C: "銅離子失去電子", D: "氫氣釋放" }, answer: "A", explanation: "原電池負極活性較強（Zn），失去電子發生『氧化反應』。" },
+      { subject: "化學", question: "電解水實驗中，連接電源『陰極』的試管所產生的氣體為何？", options: { A: "氧氣", B: "氫氣", C: "氯氣", D: "二氧化碳" }, answer: "B", explanation: "電解水時，陰極產生『氫氣』，陽極產生『氧氣』，體積比約為 2 : 1。" },
+      { subject: "化學", question: "將固體反應物磨成細粉狀可以顯著加快反應速率，主要原因為何？", options: { A: "降低活化能", B: "增加反應物接觸面積", C: "提高反應溫度", D: "增加反應熱" }, answer: "B", explanation: "磨成細粉增加了反應物的表面積/接觸面積，使碰撞機會大增。" },
+      { subject: "化學", question: "化學反應分子間必須進行有效碰撞才能發生反應，有效碰撞需滿足哪些條件？", options: { A: "足夠能量與正確碰撞位向", B: "高壓力與高溫度", C: "加入催化劑與水", D: "無限長時間" }, answer: "A", explanation: "有效碰撞必須具備『大於等於活化能的能量』以及『正確的幾何位向』。" },
+      { subject: "化學", question: "乙烯（C₂H₄）分子中包含碳碳雙鍵，屬於哪一類不飽和烴？", options: { A: "烷類", B: "烯類", C: "炔類", D: "芳香烴" }, answer: "B", explanation: "含有碳碳雙鍵（C=C）的不飽和烴稱為『烯類』。" },
+      { subject: "化學", question: "有機酸與醇類在濃硫酸催化下加熱反應生成水與具有水果香味的物質，此反應稱為：", options: { A: "皂化反應", B: "酯化反應", C: "加成反應", D: "取代反應" }, answer: "B", explanation: "有機酸 + 醇 ⇌ 酯 + 水，稱為『酯化反應』。" },
+      { subject: "化學", question: "油脂與氫氧化鈉共熱反應生成肥皂（脂肪酸鈉）與甘油，此反應稱為：", options: { A: "皂化反應", B: "酯化反應", C: "聚合反應", D: "發酵反應" }, answer: "A", explanation: "油脂在鹼性條件下水解生成肥皂的過程稱為『皂化反應』。" },
+      { subject: "化學", question: "第一個成功由人造方式合成的強韌合成纖維『尼龍-66』屬於哪一種聚合物？", options: { A: "聚醯胺類", B: "聚酯類", C: "聚乙烯類", D: "天然纖維" }, answer: "A", explanation: "尼龍（Nylon）分子鏈間含有醯胺鍵（-CONH-），屬於聚醯胺類聚合物。" },
+      { subject: "化學", question: "植物進行光合作用產生的澱粉屬於哪一類化合物？", options: { A: "單醣", B: "二醣", C: "多醣", D: "蛋白質" }, answer: "C", explanation: "澱粉與纖維素皆是由許多葡萄糖單體聚合而成的『多醣』。" },
+      { subject: "化學", question: "生物體內的去氧核糖核酸（DNA）之基本重複單位單體為何？", options: { A: "氨基酸", B: "核苷酸", C: "脂肪酸", D: "葡萄糖" }, answer: "B", explanation: "核酸（DNA 與 RNA）的基本重複單位是『核苷酸』。" },
+      { subject: "化學", question: "下列哪一種溫室氣體對人為溫室效應增加的貢獻最為顯著？", options: { A: "二氧化碳（CO₂）", B: "氧氣（O₂）", C: "氮氣（N₂）", D: "氦氣（He）" }, answer: "A", explanation: "大量燃燒化石燃料排放的 CO₂ 是造成人為溫室效應加劇的最主要氣體。" },
+      { subject: "化學", question: "臭氧層破壞主要是因為人類大量使用了哪一種化學物質？", options: { A: "氟氯碳化物（CFCs）", B: "二氧化碳", C: "甲烷", D: "二氧化硫" }, answer: "A", explanation: "CFCs 在平流層受紫外線照射釋放氯原子，會催化分解臭氧分子。" },
+      { subject: "化學", question: "現代化學提倡『綠色化學』，其核心目標為何？", options: { A: "減少或消除有害物質的使用與產生", B: "只使用綠色植物作原料", C: "增加廢棄物產量", D: "提高反應溫度" }, answer: "A", explanation: "綠色化學旨在從源頭減少有害物質、提高原子利用率、降低環境負擔。" },
+      { subject: "化學", question: "在標準狀況（STP，0°C, 1 atm）下，1 莫耳的理想氣體體積約為多少公升？", options: { A: "11.2", B: "22.4", C: "24.5", D: "100" }, answer: "B", explanation: "STP 下，任何理想氣體的莫耳體積均約為 22.4 L/mol。" },
+      { subject: "化學", question: "藍色的硫酸銅晶體（CuSO₄·5H₂O）加熱後會失去結晶水變成白色粉末，此過程屬於：", options: { A: "物理變化", B: "化學變化", C: "核反應", D: "昇華" }, answer: "B", explanation: "失去結晶水改變了化學組成與結晶結構，屬於『化學變化』。" },
+      { subject: "化學", question: "硬水中因為含有較高濃度的哪些金屬離子，會導致肥皂不易起泡？", options: { A: "鈣離子（Ca²⁺）與鎂離子（Mg²⁺）", B: "鈉離子與鉀離子", C: "鐵離子與銅離子", D: "氫離子" }, answer: "A", explanation: "硬水含有高濃度 Ca²⁺ 與 Mg²⁺，會與肥皂反應生成不溶性沈澱。" },
+      { subject: "化學", question: "濾水器中常用的『活性碳』主要是利用其何種特性來淨化水質與去除異味？", options: { A: "強氧化性", B: "多孔性與強吸附能力", C: "酸鹼中和能力", D: "強還原性" }, answer: "B", explanation: "活性碳具有巨大表面積與多孔結構，能有效吸附水中雜質與異味。" },
+      { subject: "化學", question: "原油（石油）提煉過程中，利用各成分『沸點不同』來進行分離的方法稱為：", options: { A: "過濾", B: "分餾", C: "萃取", D: "結晶" }, answer: "B", explanation: "分餾是利用混合物中各成分沸點差異進行物理分離的方法。" },
+      { subject: "化學", question: "苯（C₆H₆）分子結構具有特殊的環狀共振結構，屬於哪一類化合物？", options: { A: "脂肪烷類", B: "芳香烴", C: "醇類", D: "聚合物" }, answer: "B", explanation: "含有苯環結構的碳氫化合物稱為『芳香烴』。" },
+      { subject: "化學", question: "天然氣的主要成分為何種極簡單的烴類氣體？", options: { A: "甲烷（CH₄）", B: "丙烷（C₃H₈）", C: "乙烯（C₂H₄）", D: "丁烷（C₄H₁₀）" }, answer: "A", explanation: "天然氣的主要成分為甲烷（CH₄）；液化石油氣主要成分為丙烷與丁烷。" },
+
+      // ================= 🧬 生物 (50 題) =================
+      { subject: "生物", question: "真核細胞中，負責進行有氧呼吸並產生大量 ATP 能量的『能量工廠』胞器為何？", options: { A: "核糖體", B: "高基氏體", C: "線粒體", D: "溶體" }, answer: "C", explanation: "線粒體是真核細胞進行有氧呼吸的主要場所。" },
+      { subject: "生物", question: "物質通過細胞膜時，若不需要消耗 ATP 能量且順著濃度梯度移動，稱為：", options: { A: "主動運輸", B: "被動運輸", C: "胞吞作用", D: "胞吐作用" }, answer: "B", explanation: "被動運輸（如擴散作用）順濃度梯度進行，不需消耗 ATP。" },
+      { subject: "生物", question: "關於酵素（生物催化劑）特性的敘述，下列何者正確？", options: { A: "高溫下活性會永久失去（變性）", B: "一種酵素可催化任何反應", C: "反應中會被大量消耗", D: "只能在細胞內作用" }, answer: "A", explanation: "高溫會破壞蛋白質結構使酵素變性失效。酵素具有高度專一性。" },
+      { subject: "生物", question: "植物進行光合作用的『光反應』階段，主要在葉綠體的哪一個結構進行並釋放氧氣？", options: { A: "基質", B: "葉綠餅（類囊體）", C: "線粒體", D: "細胞核" }, answer: "B", explanation: "光反應在類囊體薄膜進行，光解水分子並釋放氧氣。" },
+      { subject: "生物", question: "人體肌肉細胞在劇烈運動缺氧時進行發酵作用，會產生哪一種累積物質？", options: { A: "酒精", B: "乳酸", C: "檸檬酸", D: "醋酸" }, answer: "B", explanation: "骨骼肌缺氧時進行乳酸發酵，生成乳酸導致肌肉酸痛。" },
+      { subject: "生物", question: "關於體細胞『有絲分裂』與生殖細胞『減數分裂』的比較，下列何者正確？", options: { A: "有絲分裂產生 4 個細胞", B: "減數分裂染色體數目會減半", C: "有絲分裂產生配子", D: "減數分裂細胞染色體數不變" }, answer: "B", explanation: "減數分裂分裂兩次，產生 4 個染色體減半（n）的配子。" },
+      { subject: "生物", question: "基因型為 AaBb 的個體自交後代（F2）表現型比例為何？", options: { A: "1:1:1:1", B: "3:1", C: "9:3:3:1", D: "1:2:1" }, answer: "C", explanation: "根據獨立分配律，雙雜交異型合子自交後代表現型比例為 9 : 3 : 3 : 1。" },
+      { subject: "生物", question: "紅綠色盲屬於 X 染色體隱性遺傳。若父親正常，母親為色盲帶因者，其『兒子』罹患色盲機率為何？", options: { A: "0%", B: "25%", C: "50%", D: "100%" }, answer: "C", explanation: "兒子從母親獲得 X 染色體。帶因者母親有 50% 機率傳遞色盲基因給兒子。" },
+      { subject: "生物", question: "中心法則中，從 DNA 轉錄成 RNA，再將 RNA 轉譯為蛋白質的場所分別為何？", options: { A: "皆在細胞核", B: "轉錄在細胞核，轉譯在細胞質（核糖體）", C: "轉錄在線粒體", D: "皆在細胞質" }, answer: "B", explanation: "DNA 在細胞核內轉錄成 mRNA，mRNA 輸出至細胞質核糖體進行轉譯。" },
+      { subject: "生物", question: "基因工程中常用於切割特定 DNA 序列的『分子剪刀』工具稱為：", options: { A: "DNA 連接酶", B: "限制酶", C: "聚合酶", D: "解旋酶" }, answer: "B", explanation: "限制酶能識別專一 DNA 序列並精確切割，是基因工程核心工具。" },
+      { subject: "生物", question: "人體消化系統中，食物營養素主要進行消化與吸收的最主要器官為何？", options: { A: "胃", B: "小腸", C: "大腸", D: "食道" }, answer: "B", explanation: "小腸具巨大表面積與多種消化液注入，是消化與吸收主器官。" },
+      { subject: "生物", question: "關於人體血管特性，下列敘述何者正確？", options: { A: "動脈管壁最薄", B: "靜脈內多設有瓣膜防止倒流", C: "微血管血流最快", D: "肺動脈流鮮紅色富氧血" }, answer: "B", explanation: "靜脈血壓低設有瓣膜防倒流；微血管管壁最薄且血流最慢。" },
+      { subject: "生物", question: "人體免疫系統中，能產生專一性抗體進行『體液免疫』反應的細胞為何？", options: { A: "B 細胞", B: "T 細胞", C: "紅血球", D: "血小板" }, answer: "A", explanation: "B 細胞分化為漿細胞可分泌抗體進行體液免疫。" },
+      { subject: "生物", question: "手碰到熱鍋迅速縮回（縮手反射），此神經傳導路徑不需經過下列哪一個中樞處理？", options: { A: "脊髓", B: "感覺神經元", C: "大腦皮質", D: "運動神經元" }, answer: "C", explanation: "縮手反射由脊髓直接作決策，不需經過大腦意識思考。" },
+      { subject: "生物", question: "血糖濃度降低時，胰臟會分泌哪一種激素以促進肝糖分解提升血糖？", options: { A: "胰島素", B: "升糖素", C: "甲狀腺素", D: "褪黑激素" }, answer: "B", explanation: "血糖低時胰島 α 細胞分泌升糖素；血糖高時 β 細胞分泌胰島素。" },
+      { subject: "生物", question: "植物體內水分與無機鹽的運輸主要依靠木質部，其主要的動力來源為何？", options: { A: "主動運輸", B: "蒸散作用形成的拉力", C: "光合作用壓力", D: "重力" }, answer: "B", explanation: "水分運輸主要依靠葉片氣孔蒸散作用產生的巨大負壓拉力。" },
+      { subject: "生物", question: "植物莖向光性生長，是因為哪一種植物激素在背光側濃度較高？", options: { A: "生長素（Auxin）", B: "離層酸", C: "乙烯", D: "吉貝素" }, answer: "A", explanation: "生長素移向背光側促進細胞伸長，導致莖彎向光源。" },
+      { subject: "生物", question: "生態系能量金字塔中，能量傳遞至上一營養階層時平均只有約多少比例被轉化儲存？", options: { A: "1%", B: "10%", C: "50%", D: "90%" }, answer: "B", explanation: "根據 10% 定律，能量轉移效率平均約僅 10%，其餘散失。" },
+      { subject: "生物", question: "生物多樣性三個主要涵蓋層面不包含下列何者？", options: { A: "遺傳多樣性", B: "物種多樣性", C: "生態系多樣性", D: "人口個數多樣性" }, answer: "D", explanation: "生物多樣性三大階層為：遺傳（基因）、物種與生態系多樣性。" },
+      { subject: "生物", question: "達爾文天擇說的核心觀念不包含下列何者？", options: { A: "過度繁殖", B: "生存競爭", C: "器官用進廢退", D: "適者生存" }, answer: "C", explanation: "用進廢退說由拉馬克提出；天擇說核心為過度繁殖、生存競爭、適者生存。" },
+      { subject: "生物", question: "原核細胞與真核細胞最主要的構造差異為何？", options: { A: "有無細胞膜", B: "有無細胞質", C: "有無核膜包裹的細胞核", D: "有無核糖體" }, answer: "C", explanation: "原核細胞（如細菌）沒有核膜包裹的成形細胞核。" },
+      { subject: "生物", question: "細胞內負責合成蛋白質的微小構造為何？", options: { A: "線粒體", B: "核糖體", C: "溶體", D: "中心體" }, answer: "B", explanation: "核糖體是細胞內合成蛋白質的場所。" },
+      { subject: "生物", question: "光合作用的『碳反應（固碳反應）』主要在葉綠體的哪一個結構進行？", options: { A: "類囊體", B: "基質", C: "外膜", D: "液泡" }, answer: "B", explanation: "碳反應（卡爾文循環）利用光反應能量在『基質』中固定 CO₂ 合成糖類。" },
+      { subject: "生物", question: "植物細胞進行細胞質分裂時，會形成何種結構將細胞一分為二？", options: { A: "縮窄環", B: "細胞板", C: "紡錘絲", D: "星狀體" }, answer: "B", explanation: "植物具細胞壁，由高基氏體囊泡融合形成『細胞板』進行分裂。" },
+      { subject: "生物", question: "DNA 雙螺旋結構中，鹼基含氮鹼基的互補配對原則為何？", options: { A: "A 配 T，C 配 G", B: "A 配 C，T 配 G", C: "A 配 U，C 配 G", D: "A 配 A，T 配 T" }, answer: "A", explanation: "DNA 中腺嘌呤（A）與胸腺嘧啶（T）配對，胞嘧啶（C）與鳥嘌呤（G）配對。" },
+      { subject: "生物", question: "負責將氨基酸運送到核糖體上進行轉譯的 RNA 種類為何？", options: { A: "mRNA", B: "tRNA", C: "rRNA", D: "snRNA" }, answer: "B", explanation: "tRNA（轉運 RNA）負責攜帶對應的氨基酸至核糖體進行蛋白質合成。" },
+      { subject: "生物", question: "細菌體內除主要染色體外，常含有可作為基因工程載體的環狀雙鏈 DNA 稱為：", options: { A: "質體（Plasmid）", B: "噬菌體", C: "染色質", D: "核糖體" }, answer: "A", explanation: "質體是細菌細胞質內獨立於主基因組外的環狀小 DNA。" },
+      { subject: "生物", question: "人類 ABO 血型遺傳屬於多複位子遺傳，基因型 Iᴬ Iᴮ 的個體血型為何？", options: { A: "A 型", B: "B 型", C: "AB 型", D: "O 型" }, answer: "C", explanation: "Iᴬ 與 Iᴮ 表現為共顯性，基因型 Iᴬ Iᴮ 表現為 AB 型。" },
+      { subject: "生物", question: "複製羊『多利（Dolly）』的誕生主要是利用了何種生物技術？", options: { A: "基因轉殖", B: "體細胞核轉移（複製技術）", C: "雜交育種", D: "組織培養" }, answer: "B", explanation: "多利是將乳腺體細胞核植入去核卵細胞中培育而成的複製動物。" },
+      { subject: "生物", question: "人體心臟四個腔室中，管壁肌肉最厚、負責將血液泵入主動脈進行體循環的是：", options: { A: "右心房", B: "右心室", C: "左心房", D: "左心室" }, answer: "D", explanation: "左心室需要產生高壓將血液推送至全身，故心肌壁最厚。" },
+      { subject: "生物", question: "神經元（神經細胞）中，主要負責接收其他神經元傳來訊息的構造為何？", options: { A: "軸突", B: "樹突", C: "髓鞘", D: "節點" }, answer: "B", explanation: "樹突負責『接收』訊息，軸突負責『傳出』訊號。" },
+      { subject: "生物", question: "人體腎臟中進行血液過濾形成原尿的主要構造為何？", options: { A: "腎小球（絲球體）與鮑氏囊", B: "腎小管", C: "集尿管", D: "輸尿管" }, answer: "A", explanation: "腎小球的高壓濾過作用將水和小分子過濾入鮑氏囊形成原尿。" },
+      { subject: "生物", question: "植物韌皮部主要負責運輸何種物質？其運輸方向為何？", options: { A: "水分；單向向上", B: "有機養分（糖類）；雙向運輸", C: "無機鹽；單向向下", D: "氧氣；隨意" }, answer: "B", explanation: "韌皮部負責輸導光合作用產生的有機養分，可雙向運輸。" },
+      { subject: "生物", question: "當環境中某有害重金屬（如水銀）進入食物鏈後，哪一營養階層體內累積的濃度最高？", options: { A: "生產者（植物）", B: "初級消費者（草食動物）", C: "高級消費者（頂級肉食動物）", D: "分解者" }, answer: "D", explanation: "生物放大作用指無法排出的毒素會隨食物鏈積聚，頂級消費者累積濃度最高。" },
+      { subject: "生物", question: "病毒不屬於傳統的生物五界分類，主要原因為何？", options: { A: "沒有遺傳物質", B: "無細胞結構且無法獨立進行新陳代謝", C: "體積過大", D: "能在水中自由運動" }, answer: "B", explanation: "病毒缺乏細胞結構與獨立代謝酵素，必須寄生於活細胞內。" },
+      { subject: "生物", question: "酵母菌屬於生物分類中的哪一界？", options: { A: "原核生物界", B: "原生生物界", C: "真菌界", D: "植物界" }, answer: "C", explanation: "酵母菌具有細胞壁但無葉綠體，屬於單細胞真菌。" },
+      { subject: "生物", question: "植物氣孔的開閉主要由哪一種細胞控制？其吸水膨脹時氣孔會如何？", options: { A: "表皮細胞；關閉", B: "保衛細胞；張開", C: "葉肉細胞；張開", D: "角質層；關閉" }, answer: "B", explanation: "保衛細胞吸水膨脹彎曲時，氣孔會張開進行氣體交換。" },
+      { subject: "生物", question: "人類的鯨魚前肢、鳥類翅膀與人類手臂骨骼結構相似，演化上稱為：", options: { A: "同源器官", B: "同功器官", C: "痕跡器官", D: "人工器官" }, answer: "A", explanation: "來源相同、基本構造相似但功能可能不同的器官稱為『同源器官』。" },
+      { subject: "生物", question: "生態系中負責將動植物遺體分解為無機物循環利用的生物稱為：", options: { A: "生產者", B: "消費者", C: "分解者", D: "寄生者" }, answer: "C", explanation: "分解者（如細菌、真菌）分解有機物為無機物，促進物質循環。" },
+      { subject: "生物", question: "生態學中，一個特定環境所能維持某生物族群的最大個體數量稱為：", options: { A: "環境負荷量（K值）", B: "死亡率", C: "總出生率", D: "遷入率" }, answer: "A", explanation: "環境負荷量（Carrying capacity）是指環境資源能長期支持的最大族群數量。" },
+      { subject: "生物", question: "火山噴發後形成的新岩石表面逐漸演化出森林的過程稱為：", options: { A: "初級演替（原生演替）", B: "次級演替", C: "退化演替", D: "人工演替" }, answer: "A", explanation: "從完全沒有土壤與生命的新遺址開始的演替稱為初級演替。" },
+      { subject: "生物", question: "地衣是真菌與綠藻的結合體，真菌提供水分無機鹽，綠藻提供養分，兩者關係為何？", options: { A: "捕食", B: "寄生", C: "互利共生", D: "競爭" }, answer: "C", explanation: "兩者生活在一起且雙方皆獲利的關係稱為『互利共生』。" },
+      { subject: "生物", question: "豆科植物根部的根瘤菌能將大氣中無法直接利用的氮氣轉化為含氮化合物，稱為：", options: { A: "硝化作用", B: "固氮作用", C: "反硝化作用", D: "氨化作用" }, answer: "B", explanation: "將氣態 N₂ 轉化為生物可利用含氮化合物的過程稱為『固氮作用』。" },
+      { subject: "生物", question: "人體特異性防禦中，負責直接殺傷被病毒感染細胞的免疫細胞為何？", options: { A: "胞毒性 T 細胞", B: "B 細胞", C: "紅血球", D: "肥大細胞" }, answer: "A", explanation: "胞毒性 T 細胞能識別並直接破壞受感染或癌變的細胞。" },
+      { subject: "生物", question: "促使水果成熟並抑制植物生長的一種氣態植物激素為何？", options: { A: "生長素", B: "乙烯", C: "吉貝素", D: "細胞分裂素" }, answer: "B", explanation: "乙烯是一種氣態植物激素，能促進果實成熟與葉片脫落。" },
+      { subject: "生物", question: "人體下視丘分泌抗利尿激素（ADH），主要作用於腎小管促進對哪種物質的再吸收？", options: { A: "葡萄糖", B: "水分", C: "鈉離子", D: "蛋白質" }, answer: "B", explanation: "ADH 作用於腎小管與集尿管，增加對水分的再吸收以減少尿量。" },
+      { subject: "生物", question: "蕨類植物成熟葉片背面常見的褐色小包構造為何？", options: { A: "孢子囊堆", B: "種子", C: "花粉包", D: "果實" }, answer: "A", explanation: "蕨類不開花不結種子，靠『孢子囊堆』散播孢子繁殖。" },
+      { subject: "生物", question: "裸子植物（如松、杉）與被子植物最主要的共同特徵為何？", options: { A: "皆能開花", B: "皆能結出果實包覆種子", C: "皆能產生種子繁殖", D: "皆無維管束" }, answer: "C", explanation: "裸子與被子植物皆屬於『種子植物』；裸子植物種子裸露無果實包覆。" },
+      { subject: "生物", question: "人體眼睛中，能控制瞳孔大小以調節進入眼球光線量的構造為何？", options: { A: "視網膜", B: "虹膜", C: "角膜", D: "晶狀體" }, answer: "B", explanation: "虹膜含有平滑肌，透過收縮舒張調節瞳孔大小。" },
+      { subject: "生物", question: "細胞膜上用於辨識自我細胞與外來異物的標籤分子通常為何？", options: { A: "醣蛋白", B: "膽固醇", C: "核酸", D: "中性脂肪" }, answer: "A", explanation: "細胞膜外側的醣蛋白作為分子標籤，參與細胞識別與免疫反應。" },
+
+      // ================= 🌍 地球科學 (50 題) =================
+      { subject: "地球科學", question: "大氣層垂直分層中，大部分天氣現象（降雨、雲、颱風）主要發生在哪一層？", options: { A: "對流層", B: "平流層", C: "中氣層", D: "熱氣層" }, answer: "A", explanation: "對流層集中了大氣約 80% 質量與幾乎全部水氣，對流旺盛。" },
+      { subject: "地球科學", question: "北半球由於科氏力影響，水平運動的風向會朝向運動方向的哪一側偏轉？", options: { A: "左側", B: "右側", C: "上方", D: "不偏轉" }, answer: "B", explanation: "科氏力使北半球運動物體向『右』偏轉，南半球向『左』偏轉。" },
+      { subject: "地球科學", question: "冷氣團主動向暖氣團推進並強行抬升暖空氣所形成的鋒面稱為：", options: { A: "暖鋒", B: "冷鋒", C: "滯留鋒", D: "囚固鋒" }, answer: "B", explanation: "冷氣團推擠暖空氣抬升為冷鋒，常帶來陣雨與劇烈降溫。" },
+      { subject: "地球科學", question: "生成颱風（熱帶氣旋）的基本環境條件中，海面水溫通常需要達到多少度以上？", options: { A: "10°C", B: "18°C", C: "26.5°C", D: "35°C" }, answer: "C", explanation: "颱風依靠熱帶洋面水氣凝結釋放潛熱，海水表面溫度需高於約 26.5°C。" },
+      { subject: "地球科學", question: "聖嬰現象發生時，赤道太平洋地區會出現下列哪種異常變化？", options: { A: "東信風增強", B: "赤道東太平洋海水溫度異常升高", C: "西太平洋水溫升高", D: "秘魯湧升流增強" }, answer: "B", explanation: "聖嬰年信風減弱，暖水東蔓，赤道東太平洋海溫異常升高。" },
+      { subject: "地球科學", question: "海洋海水平均鹽度約 35‰，溶解於海水中含量最高的離子分別為何？", options: { A: "鈣與碳酸根", B: "鈉離子與氯離子", C: "鎂與硫酸根", D: "鉀與溴" }, answer: "B", explanation: "海水中含量最豐富的溶質是食鹽，主要離子為氯離子與鈉離子。" },
+      { subject: "地球科學", question: "當太陽、地球與月球排成一直線時（新月或滿月），會出現哪種潮汐現象？", options: { A: "大潮", B: "小潮", C: "無潮", D: "海嘯" }, answer: "A", explanation: "日、地、月連成一直線時引潮力疊加，形成滿潮最高、乾潮最低的大潮。" },
+      { subject: "地球科學", question: "地球內部分層中，主要由液態鐵鎳金屬構成且被認為是地磁來源的是：", options: { A: "大陸地殼", B: "上部地函", C: "外地核", D: "內地核" }, answer: "C", explanation: "S波無法穿透外地核證實其為液態。液態金屬流動產生發電機效應形成地磁。" },
+      { subject: "地球科學", question: "全球的大洋中脊（如大西洋洋中脊）屬於下列哪一種板塊邊界類型？", options: { A: "張裂型板塊邊界", B: "聚合型板塊邊界", C: "錯動型板塊邊界", D: "穩定邊界" }, answer: "A", explanation: "洋中脊是熱地函物質上升、兩側板塊拉開分開的張裂型邊界。" },
+      { subject: "地球科學", question: "關於地震波 P 波與 S 波的特性比較，下列敘述何者正確？", options: { A: "S波比P波快", B: "P波是縱波，可在固體與液體中傳播", C: "S波可穿透液態外地核", D: "P波破壞力最大" }, answer: "B", explanation: "P波為縱波，傳播速度最快且可通過固、液、氣體；S波無法通過液體。" },
+      { subject: "地球科學", question: "臺灣太魯閣峽谷主要是由石灰岩經過高溫高壓變質而成的何種岩石？", options: { A: "玄武岩", B: "花崗岩", C: "大理岩", D: "安山岩" }, answer: "C", explanation: "太魯閣峽谷由大理岩組成，大理岩是石灰岩變質而成的變質岩。" },
+      { subject: "地球科學", question: "在地層未受倒轉情況下，下方地層年代較老、上方較新，此原則稱為：", options: { A: "地層疊置定律", B: "截切關係定律", C: "化石順序定律", D: "均變理論" }, answer: "A", explanation: "地層疊置定律指未受劇烈變動干擾時，先沉積的地層在下（老），後沉積在上（新）。" },
+      { subject: "地球科學", question: "欲測定含有有機遺骸的『近幾萬年內』地質年代，最常用的放射性同位素為：", options: { A: "鈾-238", B: "碳-14（C-14）", C: "鉀-40", D: "銣-87" }, answer: "B", explanation: "碳-14 半衰期約 5730 年，適合測定約 5 萬年以內的生物遺骸絕對年代。" },
+      { subject: "地球科學", question: "類地行星（如地球）與類木行星（如木星）相比，類地行星特徵為何？", options: { A: "體積巨大密度低", B: "由氣體與冰組成", C: "平均密度較大，由岩石金屬組成", D: "擁有龐大環系統" }, answer: "C", explanation: "類地行星體積小、質量小，但密度大（由岩石金屬構成）。" },
+      { subject: "地球科學", question: "若在臺灣（北緯 23.5°）觀察夜空，北極星在天空中的仰角約為多少度？", options: { A: "0°", B: "23.5°", C: "66.5°", D: "90°" }, answer: "B", explanation: "北半球觀測北極星仰角數值恆等於當地北緯緯度。" },
+      { subject: "地球科學", question: "赫羅圖中，絕大多數恆星（含太陽）一生中約 90% 時間停留的序列稱為：", options: { A: "主序星", B: "紅巨星", C: "白矮星", D: "超新星" }, answer: "A", explanation: "恆星核心穩定進行氫融合反應時稱為主序星。" },
+      { subject: "地球科學", question: "太陽表面溫度較低（約 4000 K）、磁場極強而呈現暗黑色的區域稱為：", options: { A: "日冕", B: "耀斑", C: "太陽黑子", D: "日珥" }, answer: "C", explanation: "黑子是光球層上磁場極強區域，抑制對流使溫度比周圍低而顯暗。" },
+      { subject: "地球科學", question: "當發生『日全食』天象時，此時月球的月相必為下列何者？", options: { A: "新月（朔）", B: "上弦月", C: "滿月（望）", D: "下弦月" }, answer: "A", explanation: "日食發生時月球位於日地之間擋住陽光，月相必為農曆初一的新月。" },
+      { subject: "地球科學", question: "哈伯定律說明遠方星系退行速度與距離成正比，直接支持了哪一個理論？", options: { A: "地心說", B: "星雲說", C: "宇宙大爆炸理論", D: "穩態理論" }, answer: "C", explanation: "哈伯定律證實宇宙正在膨脹，支持了大爆炸理論。" },
+      { subject: "地球科學", question: "沿海地區如果過度抽取地下水，最容易引發下列哪一種環境災害？", options: { A: "地盤下陷與海水倒灌", B: "火山爆發", C: "土石流", D: "酸雨" }, answer: "A", explanation: "過度抽取地下水使地層壓密，導致地盤下陷與海水倒灌。" },
+      { subject: "地球科學", question: "含有臭氧層、能吸收太陽有害紫外線並使氣溫隨高度升高而上升的大氣分層為何？", options: { A: "對流層", B: "平流層", C: "中氣層", D: "熱氣層" }, answer: "B", explanation: "平流層集中了大部分臭氧，吸收紫外線加熱大氣，大氣穩定適合飛機航行。" },
+      { subject: "地球科學", question: "晴朗無雲的晴天，沿海地區白天吹海風、晚上吹陸風，主要原因為何？", options: { A: "陸地比熱小於海水", B: "陸地比熱大於海水", C: "科氏力改變", D: "海水鹽度變化" }, answer: "A", explanation: "陸地比熱小升溫降溫皆快。白天陸熱氣壓低吹海風，晚上相反。" },
+      { subject: "地球科學", question: "相對濕度是指空氣中實際水氣壓與同溫度下飽和水氣壓的比值，當氣溫下降時相對濕度會：", options: { A: "升高", B: "降低", C: "保持不變", D: "降為零" }, answer: "A", explanation: "氣溫下降使飽和水氣壓減小，分母變小導致相對濕度升高。" },
+      { subject: "地球科學", question: "全球深海海洋環流（溫鹽環流）主要是由海水的哪兩個物理量差異所驅動？", options: { A: "溫度與鹽度（密度）", B: "風速與氣壓", C: "潮汐與月球", D: "顏色與透明度" }, answer: "A", explanation: "高緯度海域水溫低、鹽度高（密度大）下沉，驅動全球深海溫鹽環流。" },
+      { subject: "地球科學", question: "風吹拂海面帶動海水形成的表層洋流，在赤道兩側主要由何種盛行風系驅動？", options: { A: "信風（貿易風）", B: "西風帶", C: "極地東風", D: "季風" }, answer: "A", explanation: "赤道南北兩側的信風（東風帶）吹拂推動形成南北赤道洋流。" },
+      { subject: "地球科學", question: "台灣東北角與西海岸常可見到沿岸湧升流，湧升流對海洋生態的影響為何？", options: { A: "帶來底層豐富營養鹽，形成良好漁場", B: "導致海水毒性增加", C: "使水溫劇烈升高", D: "殺死浮游生物" }, answer: "A", explanation: "湧升流將深層富含硝酸鹽、磷酸鹽的營養水帶至表層，吸引浮游生物形成優良漁場。" },
+      { subject: "地球科學", question: "地殼與地函之間的物理分界面稱為：", options: { A: "莫氏不連續面", B: "古氏不連續面", C: "軟流圈", D: "核函邊界" }, answer: "A", explanation: "莫氏不連續面（Moho）是區分地殼與地函的地震波速突變面。" },
+      { subject: "地球科學", question: "喜馬拉雅山脈主要是由哪兩種板塊互相擠壓碰撞所形成的造山帶？", options: { A: "印度-澳洲板塊與歐亞板塊", B: "太平洋板塊與美洲板塊", C: "非洲板塊與南極洲板塊", D: "菲律賓海板塊與太平洋板塊" }, answer: "A", explanation: "印度板塊向北碰撞歐亞板塊，使陸地隆起形成喜馬拉雅山脈。" },
+      { subject: "地球科學", question: "著名的美國聖安地列斯斷層屬於下列哪一種板塊邊界？", options: { A: "張裂型邊界", B: "聚合型邊界", C: "錯動型板塊邊界（轉向斷層）", D: "海底火山" }, answer: "C", explanation: "兩板塊水平相錯擦身而過的邊界稱為錯動型邊界（轉向斷層）。" },
+      { subject: "地球科學", question: "地震發生時，衡量地震釋放總能量大小且無單位的指標稱為：", options: { A: "地震規模（如芮氏規模）", B: "地震震度", C: "等震線", D: "加速度級" }, answer: "A", explanation: "地震規模代表地震釋放能量總量，一次地震只有一個數值，無單位。" },
+      { subject: "地球科學", question: "夏威夷群島的火山噴發多屬於黏滯力小、氣體易逸散的玄武岩質岩漿，形成的火山地形為：", options: { A: "盾狀火山", B: "錐狀火山（複式火山）", C: "火山乾", D: "火山口湖" }, answer: "A", explanation: "玄武岩岩漿流動性高、流動距離遠，冷卻後形成坡度平緩的『盾狀火山』。" },
+      { subject: "地球科學", question: "主要由細小黏土礦物顆粒沉積壓密而成，且具有良好頁理薄層構造的沉積岩為：", options: { A: "礫岩", B: "砂岩", C: "頁岩", D: "石灰岩" }, answer: "C", explanation: "頁岩由細微泥黏土顆粒沉積而成，具易剝落的頁理結構。" },
+      { subject: "地球科學", question: "地質學中用於確定特定地層相對年代、生存時間短且分佈廣泛的化石稱為：", options: { A: "標準化石（指準化石）", B: "指相化石", C: "活化石", D: "微體化石" }, answer: "A", explanation: "標準化石（如古生代三葉蟲、中生代菊石）能精確判定地層年代。" },
+      { subject: "地球科學", question: "地質年代中，恐龍與菊石大量繁盛並主宰地球的時代為何？", options: { A: "前寒武紀", B: "古生代", C: "中生代", D: "新生代" }, answer: "C", explanation: "中生代（含三疊紀、侏羅紀、白堊紀）稱為『恐龍時代』。" },
+      { subject: "地球科學", question: "月球繞地球公轉一圈相對於太陽的月相變化週期（朔望月）約為多少天？", options: { A: "24 小時", B: "27.3 天", C: "29.53 天", D: "365 天" }, answer: "C", explanation: "月相從新月到下一次新月的週期（朔望月）約為 29.53 天。" },
+      { subject: "地球科學", question: "發生『月食』天象時，月球進入地球陰影中，此時的月相必定為何？", options: { A: "新月（朔）", B: "上弦月", C: "滿月（望）", D: "下弦月" }, answer: "C", explanation: "月食時地球介於日月之間，月相必定為農曆十五的滿月（望）。" },
+      { subject: "地球科學", question: "地球由西向東自轉，導致天空中所有恆星與太陽呈現何種視運動？", options: { A: "東升西落", B: "西升東落", C: "靜止不動", D: "南升北落" }, answer: "A", explanation: "地球自西向東自轉，使地表觀察者看到天體皆作『東升西落』的視運動。" },
+      { subject: "地球科學", question: "地球產生四季更替變化的最核心天文原因為何？", options: { A: "地球公轉軌道是橢圓形，離太陽遠近不同", B: "地軸傾斜 23.5 度並繞太陽公轉，導致太陽直射緯度改變", C: "太陽發光強度週期變化", D: "月球引力拉扯" }, answer: "B", explanation: "四季成因是地軸傾斜 23.5° 公轉，使太陽直射點在南北回歸線間轉移。" },
+      { subject: "地球科學", question: "夏至（約 6 月 22 日）當天中午，太陽會直射地球的哪一個緯度？", options: { A: "赤道（0°）", B: "北回歸線（23.5°N）", C: "南回歸線（23.5°S）", D: "北極圈" }, answer: "B", explanation: "夏至太陽直射北回歸線（23.5°N），北半球晝最長夜最短。" },
+      { subject: "地球科學", question: "衡量恆星『真實發光能力』而非距離遠近影響的星等稱為：", options: { A: "視星等", B: "絕對星等", C: "色指數", D: "輻射星等" }, answer: "B", explanation: "絕對星等是將恆星統一放在 10 焦秒（約 32.6 光年）處測得的發光強度。" },
+      { subject: "地球科學", question: "恆星發出的光芒顏色與其表面溫度密切相關，下列哪一種顏色的恆星表面溫度最高？", options: { A: "紅色", B: "黃色", C: "白色", D: "藍色" }, answer: "D", explanation: "恆星表面溫度越高顏色越偏藍紫，溫度由高到低：藍 > 白 > 黃 > 紅。" },
+      { subject: "地球科學", question: "太陽風帶電粒子受到地球磁場引導，在大氣高層與氣體分子碰撞激發發光的現象稱為：", options: { A: "極光", B: "流星雨", C: "日珥", D: "彩虹" }, answer: "A", explanation: "高緯度地區太陽風粒子沿磁力線進入高層大氣撞擊氣體分子產生『極光』。" },
+      { subject: "地球科學", question: "長週期彗星的主要來源被認為是位於太陽系最外圍的球狀雲氣結構，稱為：", options: { A: "小行星帶", B: "柯伊伯帶", C: "奧爾特雲", D: "銀河系中心" }, answer: "C", explanation: "長週期彗星來自太陽系最外圍球狀包覆的『奧爾特雲』。" },
+      { subject: "地球科學", question: "冥王星在 2006 年被國際天文學聯合會重新歸類為哪一類天體？", options: { A: "類地行星", B: "矮行星", C: "小行星", D: "彗星" }, answer: "B", explanation: "冥王星因無法清除軌道附近的其他雜物，被重分類為『矮行星』。" },
+      { subject: "地球科學", question: "地球溫室效應主要機制是大氣中的溫室氣體能強烈吸收哪一種波長的輻射？", options: { A: "太陽紫外線", B: "太陽可見光", C: "地球表面發出的長波紅外線輻射", D: "伽瑪射線" }, answer: "C", explanation: "溫室氣體透光可見光，但會吸收地表冷卻發出的『長波紅外線』熱輻射。" },
+      { subject: "地球科學", question: "台灣北部大屯火山群（如七星山、小油坑）主要屬於哪一種岩石構成的火山地形？", options: { A: "玄武岩", B: "安山岩", C: "花崗岩", D: "頁岩" }, answer: "B", explanation: "台灣北部火山群與島弧火山作用相關，主要是由『安山岩』構成。" },
+      { subject: "地球科學", question: "當海水面因為全球暖化而上升時，下列哪一種海岸地形受影響最嚴重？", options: { A: "斷崖海岸", B: "沙岸與洲潟海岸", C: "岩岸", D: "峽灣海岸" }, answer: "B", explanation: "坡度平緩的沙岸與洲潟海岸對於海平面上升極度敏感，最易被淹沒侵蝕。" },
+      { subject: "地球科學", question: "地層受力發生斷裂並沿斷裂面發生相對位移的構造稱為：", options: { A: "褶皺", B: "節理", C: "斷層", D: "層理" }, answer: "C", explanation: "岩層破裂且兩側有明顯相對位移者稱為『斷層』；無位移者稱為『節理』。" },
+      { subject: "地球科學", question: "地下水層中，夾在兩個不透水層之間、承受較高水壓的地下水體稱為：", options: { A: "自由地下水", B: "受壓地下水", C: "伏流水", D: "滯留水" }, answer: "B", explanation: "夾於不透水層間的水體受高壓作用稱為『受壓地下水』，鑿井可形成自流井。" },
+      { subject: "地球科學", question: "地球大氣能夠長期留存、不至於全部散逸到太空中，主要是依靠地球的：", options: { A: "磁場", B: "巨大重力與適宜溫度", C: "自轉速度", D: "海洋面積" }, answer: "B", explanation: "地球擁有足夠大的質量產生重力吸引氣體分子，且溫度適中防止氣體劇烈散逸。" }
+      {
+        subject: "物理",
+        question: "關於電磁波與光波的性質，下列敘述何者正確？",
+        options: {
+          A: "電磁波在真空中無法傳播，需要介質",
+          B: "可見光屬於電磁波的一種，其在真空中的傳播速率約為 3 × 10⁸ m/s",
+          C: "紅外線的頻率高於紫外線",
+          D: "聲波也是電磁波的一種"
+        },
+        answer: "B",
+        explanation: "電磁波傳播不需要介質，真空中速率為光速 (約 3 × 10⁸ m/s)。紫外線頻率高於紅外線，而聲波屬於力學波非電磁波。"
+      },
+      {
+        subject: "物理",
+        question: "一物體自靜止開始作等加速度直線運動，若 2 秒內行進了 8 公尺，則該物體的加速度大小為多少 m/s²？",
+        options: { A: "2", B: "4", C: "8", D: "16" },
+        answer: "B",
+        explanation: "根據等加速度運動公式 S = (1/2)at²，帶入 S = 8, t = 2 得：8 = (1/2) × a × (2)² ⟹ 8 = 2a ⟹ a = 4 m/s²。"
+      },
+      {
+        subject: "化學",
+        question: "有關週期表元素的性質變化趨勢，下列敘述何者正確？",
+        options: {
+          A: "同一週期的元素，原子序越大，金屬性越強",
+          B: "同一主族（縱列）的元素，具有相似的化學性質",
+          C: "惰性氣體（十八族）極容易與其他元素發生化學反應",
+          D: "非金屬元素主要分佈在週期表的左下角"
+        },
+        answer: "B",
+        explanation: "同族元素因價電子數相同，故具有相似的化學性質。同週期原子序越大非金屬性越強；惰性氣體活性極低；非金屬主要在右上角。"
+      },
+      {
+        subject: "化學",
+        question: "在常溫常壓下，將 1 莫耳的食鹽（NaCl）完全溶解於 1 公升的水中，則此溶液的體積莫耳濃度為多少 M？",
+        options: { A: "0.5 M", B: "1.0 M", C: "2.0 M", D: "無法精確計算，因為溶液總體積略大於 1 公升" },
+        answer: "D",
+        explanation: "體積莫耳濃度 (M) = 溶質莫耳數 / 溶液總體積(L)。加入食鹽溶解後，溶液總體積會改變（略大於原本的 1 公升水），故嚴格來說需測量混合後總體積才能精確計算。"
+      },
+      {
+        subject: "生物",
+        question: "關於細胞呼吸作用與光合作用的比較，下列何者正確？",
+        options: {
+          A: "光合作用只在白天進行，呼吸作用只在晚上進行",
+          B: "植物細胞只有葉綠體，沒有線粒體",
+          C: "光合作用吸收二氧化碳並釋放氧氣；呼吸作用消耗氧氣並釋放二氧化碳",
+          D: "呼吸作用的主要場所是核糖體"
+        },
+        answer: "C",
+        explanation: "呼吸作用是生物維持生命隨時進行的（主要在線粒體）；植物細胞同時擁有葉綠體與線粒體。"
+      },
+      {
+        subject: "生物",
+        question: "下列關於人類 DNA 與 RNA 的比較，何者正確？",
+        options: {
+          A: "DNA 雙鏈結構含有尿嘧啶 (U)",
+          B: "RNA 通常為單鏈構造，且含核糖 (Ribose)",
+          C: "DNA 主要分佈於細胞質中",
+          D: "RNA 含有胸腺嘧啶 (T) 而非尿嘧啶 (U)"
+        },
+        answer: "B",
+        explanation: "DNA 為雙螺旋結構，含去氧核糖與鹼基 A, T, C, G；RNA 為單鏈，含核糖與鹼基 A, U, C, G。DNA 主要位於細胞核內。"
+      },
+      {
+        subject: "地球科學",
+        question: "關於台灣地質與板塊構造的敘述，下列何者正確？",
+        options: {
+          A: "台灣位於太平洋板塊與歐亞板塊的交界處",
+          B: "花東縱谷是菲律賓海板塊與歐亞板塊碰撞的縫合帶",
+          C: "台灣西部麓山帶主要由變質岩構成",
+          D: "台灣本島沒有任何火山活動痕跡"
+        },
+        answer: "B",
+        explanation: "台灣位於『菲律賓海板塊』與『歐亞板塊』交界處；花東縱谷為兩板塊縫合帶；中央山脈多變質岩，北部（大屯火山群、基隆山）則有火山地形。"
+      },
+      {
+        subject: "地球科學",
+        question: "造成溫室效應的主要溫室氣體中，在大氣中含量最多且對自然溫室效應貢獻最大的是：",
+        options: { A: "二氧化碳 (CO₂)", B: "水氣 (H₂O)", C: "甲烷 (CH₄)", D: "臭氧 (O₃)" },
+        answer: "B",
+        explanation: "自然溫室效應貢獻最大的是『水氣』；而人為排放增加最顯著、最受關注的溫室氣體則是『二氧化碳』。"
+      }
+    ];
+
+    let filteredQuestions = [];
+    let currentIndex = 0;
     let streak = 0;
     let currentSubject = '全部';
     let wrongQuestions = JSON.parse(localStorage.getItem('tooth_wrong_questions') || '[]');
 
     const encouragementList = [
-      "那些無人問津的黑夜，正悄悄醞釀著屬於你的破曉。",
+     "那些無人問津的黑夜，正悄悄醞釀著屬於你的破曉。",
       "你筆尖流淌過的每一滴墨水，都在為未來的世界鋪路。",
       "別害怕起步晚或走得慢，只要還在路上，星光就不會熄滅。",
       "試題本上的每一道紅筆劃痕，都是你戰勝自我留下的勳章。",
@@ -169,17 +1159,9 @@
       "時間從不語，卻回答了所有的付出與堅持。"
     ];
 
-    let quotePool = [];
-
-    function getRandomQuote() {
-      if (quotePool.length === 0) quotePool = [...encouragementList];
-      const randomIndex = Math.floor(Math.random() * quotePool.length);
-      return quotePool.splice(randomIndex, 1)[0];
-    }
-
     window.onload = () => {
       updateWrongCount();
-      fetchQuestion();
+      filterSubject('全部');
     };
 
     function switchTab(tab) {
@@ -188,171 +1170,37 @@
       document.getElementById('view-quiz').classList.toggle('hidden', tab !== 'quiz');
       document.getElementById('view-wrong').classList.toggle('hidden', tab !== 'wrong');
 
-      if (tab === 'wrong') {
-        renderWrongQuestions();
-      }
+      if (tab === 'wrong') renderWrongQuestions();
     }
 
     function selectSubject(subject, btn) {
       document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentSubject = subject;
-      fetchQuestion();
+      filterSubject(subject);
     }
 
-    /* 🎯 呼叫 Google 官方 Gemini 2.0 API 生成考題 */
-    async function fetchQuestion() {
-      document.getElementById('loading').classList.remove('hidden');
-      document.getElementById('loading-text').innerText = 'Google AI 正在生成最新考題...';
-      document.getElementById('quiz-card').classList.add('hidden');
+    function filterSubject(subject) {
+      if (subject === '全部') {
+        filteredQuestions = [...database];
+      } else {
+        filteredQuestions = database.filter(q => q.subject === subject);
+      }
+      // 隨機打亂題目順序
+      filteredQuestions.sort(() => Math.random() - 0.5);
+      currentIndex = 0;
+      displayQuestion();
+    }
+
+    function displayQuestion() {
+      if (filteredQuestions.length === 0) return;
+      const q = filteredQuestions[currentIndex % filteredQuestions.length];
+
+      document.getElementById('q-badge').innerText = '💡 ' + q.subject;
+      document.getElementById('q-text').innerText = q.question;
       document.getElementById('q-explanation').classList.add('hidden');
       document.getElementById('btn-next').classList.add('hidden');
 
-      const subjectPrompt = currentSubject === '全部' 
-        ? '隨機挑選：物理、化學、生物、地球科學' 
-        : `指定科目：${currentSubject}`;
-
-      const prompt = `你是一個台灣 108 課綱學測自然科命題專家。請出一題符合學測難度的單選題（${subjectPrompt}）。請嚴格遵守回傳純 JSON 格式如下：
-      {
-        "subject": "${currentSubject === '全部' ? '物理/化學/生物/地科' : currentSubject}", 
-        "question": "題目描述",
-        "options": {"A": "選項A", "B": "選項B", "C": "選項C", "D": "選項D"},
-        "answer": "A",
-        "explanation": "詳細觀念解析"
-      }`;
-
-      try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${EMBEDDED_API_KEY.trim()}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              responseMimeType: "application/json" // 強制 Google 回傳標準 JSON
-            }
-          })
-        });
-
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error?.message || 'Gemini API 請求失敗');
-
-        const textResult = data.candidates[0].content.parts[0].text;
-        currentQuestion = JSON.parse(textResult);
-
-        displayQuestion(currentQuestion);
-        document.getElementById('quiz-card').classList.remove('hidden');
-      } catch (err) {
-        console.error("出題失敗:", err);
-        alert('出題失敗：' + err.message + '\n請重新檢查 API Key 或網路連線。');
-      } finally {
-        document.getElementById('loading').classList.add('hidden');
-      }
-    }
-
-    /* 🖼️ 前端圖片壓縮 (確保上傳速度) */
-    function compressImage(file, maxWidth = 1024, maxHeight = 1024, quality = 0.8) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
-          const img = new Image();
-          img.src = event.target.result;
-          img.onload = () => {
-            let width = img.width;
-            let height = img.height;
-            if (width > height) {
-              if (width > maxWidth) {
-                height = Math.round((height * maxWidth) / width);
-                width = maxWidth;
-              }
-            } else {
-              if (height > maxHeight) {
-                width = Math.round((width * maxHeight) / height);
-                height = maxHeight;
-              }
-            }
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL('image/jpeg', quality));
-          };
-          img.onerror = (err) => reject(err);
-        };
-        reader.onerror = (err) => reject(err);
-      });
-    }
-
-    /* 📸 呼叫 Google 官方 Gemini 2.0 Vision API 辨識照片 */
-    async function handlePhotoUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const loadingBox = document.getElementById('wrong-loading');
-      const loadingText = document.getElementById('wrong-loading-text');
-      loadingBox.classList.remove('hidden');
-      loadingText.innerText = '正在處理照片並連線 Google AI 辨識...';
-
-      try {
-        // 1. 先將圖片壓縮並轉為 Base64
-        const base64DataUrl = await compressImage(file);
-        // 提取純 Base64 數據（去除前綴 data:image/jpeg;base64,）
-        const base64Data = base64DataUrl.split(',')[1];
-
-        const promptText = `請分析這張照片裡的台灣學測自然科題目（物理/化學/生物/地球科學）。請辨識出題目內容、選項、正確答案並撰寫詳細的觀念解析。請嚴格回傳純 JSON 格式如下：
-        {
-          "subject": "物理/化學/生物/地科",
-          "question": "題目描述",
-          "options": {"A": "選項A", "B": "選項B", "C": "選項C", "D": "選項D"},
-          "answer": "正確答案字母（如 A）",
-          "explanation": "詳細觀念解析"
-        }`;
-
-        // 2. 打 Google 官方 Gemini API 端點
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${EMBEDDED_API_KEY.trim()}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: promptText },
-                {
-                  inline_data: {
-                    mime_type: "image/jpeg",
-                    data: base64Data
-                  }
-                }
-              ]
-            }],
-            generationConfig: {
-              responseMimeType: "application/json" // 強制 Google 回傳標準 JSON
-            }
-          })
-        });
-
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error?.message || '照片辨識失敗');
-
-        const textResult = data.candidates[0].content.parts[0].text;
-        const parsedQ = JSON.parse(textResult);
-
-        saveToWrongBook(parsedQ);
-        renderWrongQuestions();
-        alert('🎉 題目成功解析並已自動加入錯題本！');
-
-      } catch (err) {
-        console.error("照片分析失敗:", err);
-        alert('照片辨識失敗：' + err.message + '\n提示：請確保圖片字跡清晰，並檢查網路連線。');
-      } finally {
-        loadingBox.classList.add('hidden');
-        event.target.value = ''; // 清空選擇器，使同張照片可再次觸發
-      }
-    }
-
-    function displayQuestion(q) {
-      document.getElementById('q-badge').innerText = '💡 ' + q.subject;
-      document.getElementById('q-text').innerText = q.question;
       const optionsContainer = document.getElementById('q-options');
       optionsContainer.innerHTML = '';
 
@@ -360,16 +1208,16 @@
         const btn = document.createElement('button');
         btn.className = 'btn-option';
         btn.innerHTML = `<b>${key}.</b> ${q.options[key]}`;
-        btn.onclick = () => checkAnswer(key, btn);
+        btn.onclick = () => checkAnswer(key, btn, q);
         optionsContainer.appendChild(btn);
       });
     }
 
-    function checkAnswer(selected, selectedBtn) {
+    function checkAnswer(selected, selectedBtn, q) {
       const allBtns = document.querySelectorAll('.btn-option');
       allBtns.forEach(btn => btn.onclick = null);
 
-      if (selected === currentQuestion.answer) {
+      if (selected === q.answer) {
         selectedBtn.classList.add('correct');
         streak++;
         if (streak > 0 && streak % 5 === 0) {
@@ -379,17 +1227,21 @@
         selectedBtn.classList.add('wrong');
         streak = 0;
         allBtns.forEach(btn => {
-          if (btn.innerText.startsWith(currentQuestion.answer)) btn.classList.add('correct');
+          if (btn.innerText.startsWith(q.answer)) btn.classList.add('correct');
         });
-
-        saveToWrongBook(currentQuestion);
+        saveToWrongBook(q);
       }
 
       document.getElementById('streak-count').innerText = `🔥 連勝: ${streak}`;
       const expBox = document.getElementById('q-explanation');
-      expBox.innerHTML = `<strong>💡 解析：</strong><br>${currentQuestion.explanation}`;
+      expBox.innerHTML = `<strong>💡 觀念解析：</strong><br>${q.explanation}`;
       expBox.classList.remove('hidden');
       document.getElementById('btn-next').classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      displayQuestion();
     }
 
     function saveToWrongBook(q) {
@@ -418,8 +1270,8 @@
         container.innerHTML = `
           <div class="card" style="text-align: center; color: var(--text-muted); padding: 40px 20px;">
             <p style="font-size: 2.5rem; margin-bottom: 8px;">🎉</p>
-            <p style="font-weight: 700; font-size: 1.1rem;">目前沒有任何錯題記錄！</p>
-            <p style="font-size: 0.85rem; margin-top: 4px;">點擊上方按鈕即可從相簿選擇或拍照加入錯題本喔！</p>
+            <p style="font-weight: 700; font-size: 1.1rem;">錯題本目前空空如也！</p>
+            <p style="font-size: 0.85rem; margin-top: 4px;">刷題時答錯的題目會自動記錄在這裡喔！</p>
           </div>`;
         return;
       }
@@ -429,30 +1281,54 @@
           <button class="btn-delete" onclick="removeFromWrongBook(${idx})">已弄懂 ✕</button>
           <div class="subject-badge">💡 ${q.subject}</div>
           <div class="question-text" style="margin-bottom: 12px;">${q.question}</div>
+          ${q.options ? `
           <div class="options" style="margin-bottom: 12px;">
             ${Object.keys(q.options).map(key => `
               <div class="btn-option ${key === q.answer ? 'correct' : ''}" style="cursor: default; padding: 10px 14px; font-size: 0.95rem;">
                 <b>${key}.</b> ${q.options[key]}
               </div>
             `).join('')}
-          </div>
+          </div>` : ''}
           <div class="explanation" style="margin-top: 0;">
-            <strong>💡 正確答案與解析：</strong><br>${q.explanation}
+            <strong>💡 解析 / 筆記：</strong><br>${q.explanation}
           </div>
         </div>
       `).join('');
     }
 
+    function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); }
+    function closeAddModal() { document.getElementById('add-modal').classList.add('hidden'); }
+
+    function saveCustomWrong() {
+      const sub = document.getElementById('custom-subject').value;
+      const qText = document.getElementById('custom-question').value.trim();
+      const expText = document.getElementById('custom-explanation').value.trim();
+
+      if (!qText) { alert("請輸入題目內容"); return; }
+
+      const customObj = {
+        subject: sub,
+        question: qText,
+        options: null,
+        answer: "",
+        explanation: expText || "無附加解析"
+      };
+
+      saveToWrongBook(customObj);
+      renderWrongQuestions();
+      closeAddModal();
+      document.getElementById('custom-question').value = "";
+      document.getElementById('custom-explanation').value = "";
+    }
+
     function showRewardModal(currentStreak) {
-      const quote = getRandomQuote();
+      const quote = encouragementList[Math.floor(Math.random() * encouragementList.length)];
       document.getElementById('reward-title').innerText = `🔥 突破 ${currentStreak} 連勝！`;
       document.getElementById('reward-msg').innerText = quote;
       document.getElementById('reward-modal').classList.remove('hidden');
     }
 
-    function closeRewardModal() {
-      document.getElementById('reward-modal').classList.add('hidden');
-    }
+    function closeRewardModal() { document.getElementById('reward-modal').classList.add('hidden'); }
   </script>    
 </body>
 </html>
