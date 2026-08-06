@@ -469,7 +469,7 @@ function updateTimerDisplay() {
 
     function init() {
       updateStreakDisplay(); // 讓畫面顯示剛從 localStorage 抓到的數字
-  loadQuestion();
+      loadQuestion();
       renderMath();
       selectSubject('全部', document.querySelector('.subject-btn.active'));
       document.getElementById('wrong-count').innerText = wrongBook.length;
