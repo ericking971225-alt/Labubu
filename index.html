@@ -200,294 +200,105 @@
   </div>
  <script src="data.js"></script>
  <script>
-   // 從 localStorage 抓取連勝紀錄，如果沒有紀錄（第一次玩），就預設為 0
-let currentStreak = parseInt(localStorage.getItem('winStreak')) || 0;
-   // 更新畫面上連勝數字的函式
-function updateStreakDisplay() {
-  // 請確認 'streak-text' 是你 HTML 裡面顯示連勝數字的 ID
-  const streakElement = document.getElementById('streak-text'); 
-  if (streakElement) {
-    streakElement.innerText = currentStreak;
-  }
-}
-function renderMath() {
-  // 讓程式稍微等 50 毫秒，確保 HTML 已經把題目文字確實印在畫面上
-  setTimeout(() => {
-    if (window.MathJax && window.MathJax.typesetPromise) {
-      // 1. 清除 MathJax 的舊記憶，強迫它重新看待整個網頁
-      MathJax.typesetClear();
-      
-      // 2. 重新掃描並把純文字變成數學公式
-      MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err));
-    }
-  }, 50);
-}
-   let isSaving = false;
+    // 1. 全域變數宣告
+    let currentStreak = parseInt(localStorage.getItem('winStreak')) || 0;
+    let currentSubject = '全部';
+    let filteredDB = [];
+    let currentQuestion = null;
+    let wrongBook = JSON.parse(localStorage.getItem('labu_wrong_book')) || [];
+    let wrongBookFilterSubject = '全部';
 
-function saveCustomWrong() {
-  // 1. 防止使用者連續快速點擊導致重複儲存
-  if (isSaving) return;
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let currentImageBase64 = null;
 
-  // 2. 取得輸入欄位資料
-  const subject = document.getElementById('custom-subject')?.value || '';
-  const question = document.getElementById('custom-question')?.value.trim();
-  const optionsA = document.getElementById('custom-opt-a')?.value || '';
-  const optionsB = document.getElementById('custom-opt-b')?.value || '';
-  const optionsC = document.getElementById('custom-opt-c')?.value || '';
-  const optionsD = document.getElementById('custom-opt-d')?.value || '';
-  const answer = document.getElementById('custom-answer')?.value || 'A';
-  const explanation = document.getElementById('custom-explanation')?.value || '';
-
-  // 3. 驗證：至少要有文字或圖片
-  if (!question && !currentImageBase64) {
-    alert("請至少輸入題目文字或上傳題目照片！");
-    return;
-  }
-
-  const saveBtn = document.getElementById('save-btn');
-
-  try {
-    // 進入儲存狀態，按鈕變更狀態
-    isSaving = true;
-    if (saveBtn) {
-      saveBtn.disabled = true;
-      saveBtn.innerText = "儲存中...";
-    }
-
-    // 4. 讀取並更新 localStorage
-    const customList = JSON.parse(localStorage.getItem('customWrongBook') || '[]');
-    
-    const newEntry = {
-      id: 'custom_' + Date.now(),
-      subject: subject,
-      question: question,
-      options: { A: optionsA, B: optionsB, C: optionsC, D: optionsD },
-      answer: answer,
-      explanation: explanation,
-      image: currentImageBase64,
-      createdAt: new Date().toLocaleDateString()
-    };
-
-    customList.unshift(newEntry);
-    localStorage.setItem('customWrongBook', JSON.stringify(customList));
-
-    alert("成功新增錯題！");
-
-    // 5. ✅ 清空表單與預覽圖
-    resetCustomForm();
-
-    // 6. ✅ 自動關閉彈窗 (請確認你的 modal ID 是什麼，常見為 custom-modal 或 add-modal)
-    closeCustomModal();
-
-    // 7. ✅ 重新渲染錯題本畫面
-    if (typeof renderWrongBook === 'function') {
-      renderWrongBook();
-    }
-
-  } catch (error) {
-    console.error("儲存失敗：", error);
-    if (error.name === 'QuotaExceededError') {
-      alert("儲存失敗：照片檔案太大導致瀏覽器空間不足，請先清除部分舊錯題或選擇較小圖片！");
-    } else {
-      alert("儲存時發生錯誤：" + error.message);
-    }
-  } finally {
-    // 解除鎖定狀態，恢復按鈕
-    isSaving = false;
-    if (saveBtn) {
-      saveBtn.disabled = false;
-      saveBtn.innerText = "儲存錯題";
-    }
-  }
-}
-// 全域計時器變數
-let timerInterval = null;
-let secondsElapsed = 0;
-
-// 1. 開始/重置計時器
-function startTimer() {
-  // 先停止先前的計時器，防止重複開多個計時器
-  stopTimer();
-
-  // 重置計時秒數
-  secondsElapsed = 0;
-  updateTimerDisplay();
-
-  // 每秒更新一次
-  timerInterval = setInterval(() => {
-    secondsElapsed++;
-    updateTimerDisplay();
-  }, 1000);
-}
-
-// 2. 停止計時器
-function stopTimer() {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-}
-
-// 3. 格式化時間 (分:秒) 並更新畫面
-function updateTimerDisplay() {
-  const timerElement = document.getElementById('timer-text');
-  if (!timerElement) return;
-
-  const minutes = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
-  const seconds = (secondsElapsed % 60).toString().padStart(2, '0');
-  timerElement.innerText = `${minutes}:${seconds}`;
-}
-    // ==========================================
-    // 1. 100句不重複感性鼓勵語 (學測專屬)
-    // ==========================================
+    // 2. 100句感性鼓勵語 (學測專屬)
     const quotesPool = [
-      "撐過去，學測的勝利就是你的！",
-      "現在的汗水，都是明天的分數！",
-      "再堅持一下，頂大在向你招手！", 
-      "錯誤是成功的養分，訂正過後你更強了！",
-      "每一次的連勝，都是實力的累積！",
-      "今天多刷一題，考場上就少一分懊悔。",
-      "沒有奇蹟，只有不斷累積的軌跡。", 
-      "別人休息時你還在拚，這就是你贏的原因。",
-      "痛苦是短暫的，但榜單上的名字是一輩子的。", 
-      "把不會的弄懂，你已經比昨天的自己更強！",
-      "每一次的點擊，都是通往夢想校系的步伐。", 
-      "別怕錯題，那是考卷給你的溫柔提示。", 
-      "讀不完是正常的，但不讀是絕對不行的！", 
-      "累了就深呼吸，然後繼續拿下這一題。", 
-      "學測不是比誰聰明，是比誰有韌性。",
-      "黑馬不是天生的，是無數個夜晚熬出來的。",
-      "你現在流的每一滴汗，都會變成考場上的底氣。", 
-      "不要去想結果，專注在眼前的這道題。", 
-      "連勝的火焰，象徵你燃燒的鬥志！", 
-      "答對了！將這份手感延續到學測當天。",
-      "既然選擇了遠方，便只顧風雨兼程。", 
-      "每一科的破百，都是你實力的見證。", 
-      "那些看似不起波瀾的日復一日，會突然在某天讓人看到堅持的意義。", 
-      "你的極限，遠比你想像的還要遠。", 
-      "把筆握緊，把分數拿下！",
-      "不要懷疑自己，你比你想像的更優秀。",
-      "現在的辛苦，是為了未來的自由。", 
-      "連勝中！保持這個節奏，無人能擋。", 
-      "學測這場馬拉松，撐到最後的才是贏家。",
-      "相信過程，結果自然會水到渠成。",
-      "不要為昨天的錯題哭泣，要為今天的全對歡呼。", 
-      "你專注的樣子，是最耀眼的青春。", 
-      "所有的挫折，都是為了成就最後的榮耀。", 
-      "這題又拿下了！距離理想大學又近了一公尺。", 
-      "沒有所謂的運氣，只有準備好的實力。",
-      "別讓未來的你，討厭現在放棄的自己。", 
-      "學測戰士，今天也要火力全開！", 
-      "你不需要很厲害才能開始，但你需要開始才會很厲害。", 
-      "把每一次練習都當作正式上場。", 
-      "穩紮穩打，步步為營，這就是學霸的節奏。",
-      "今天不走，明天就要用跑的。", 
-      "專注力是你的超能力，繼續保持！", 
-      "那些你熬過的夜，都會變成發光的星。",
-      "不怕千萬人阻擋，只怕自己投降。", 
-      "成功沒有捷徑，只有刷不完的題。",
-      "將來的你，一定會感謝現在拼命的自己。",
-      "這題的觀念你已經完全掌握了，太棒了！", 
-      "學習就像爬山，越往上越累，但也越美。", 
-      "你流下的每一滴汗，都不會被辜負。", 
-      "現在多對一題，級分就多一級。",
-      "堅持下去，因為你值得更好的未來。", 
-      "你的努力，時間都看得見。", 
-      "不要害怕失敗，因為那是成功的必經之路。", 
-      "每一次的突破，都是對自己最好的交代。", 
-      "繼續保持這股氣勢，一鼓作氣衝上頂峰！",
-      "學測只是一個關卡，而你已經具備過關的實力。", 
-      "把錯誤留在今天，把正確帶進考場。", 
-      "你的潛力無限，別被現在的成績設限。",
-      "多一份堅持，就多一分勝算。", 
-      "加油！你離夢想只差最後一哩路。",
-      "不管題目多難，你都能迎刃而解。", 
-      "你的大腦正在高速運轉，保持這個狀態！", 
-      "連勝的感覺很棒吧？記住這個成就感。", 
-      "不要被壓力擊倒，讓壓力成為你的動力。", 
-      "你就是自己命運的設計師。",
-      "把每一天都當作學測前一天來拚。",
-      "你的毅力令人敬佩，繼續加油！", 
-      "只要不放棄，就永遠有希望。", 
-      "知識是你的武器，考場是你的戰場。", 
-      "帶著自信上陣，你一定能贏。",
-      "每一次的練習，都在為你的夢想鋪路。",
-      "你的進步肉眼可見，繼續保持！",
-      "不要跟別人比，跟昨天的自己比就好。", 
-      "就算疲憊，也要咬牙撐過去。", 
-      "你正在為自己的未來打下堅實的基礎。",
-      "每一次的答對，都是對自己實力的肯定。",
-      "把困難當作挑戰，把錯誤當作學習。", 
-      "你的專注度滿分，這就是成功的關鍵。", 
-      "不要讓任何事情阻礙你前進的腳步。",
-      "你是一個充滿潛力的學測戰士！",
-      "把焦慮化為行動，把壓力化為實力。", 
-      "你的努力終將獲得回報。", 
-      "只要方向正確，就不怕路途遙遠。", 
-      "每一道錯題，都是你進步的階梯。", 
-      "你正在創造屬於自己的奇蹟。",
-      "不要低估自己的能力，你比你想像的更強。", 
-      "把每一次的挫折，當作成長的養分。", 
-      "你的堅持，將會為你帶來豐碩的果實。", 
-      "繼續保持這份熱情，直到學測結束。", 
-      "你是一個不折不扣的學霸潛力股！",
-      "把每一次的練習，都當作是一次蛻變。", 
-      "你的汗水，將會澆灌出美麗的花朵。", 
-      "不要畏懼挑戰，勇敢地迎上去吧！",
-      "你的未來，由你自己掌握。", 
-      "你就是下一個學測黑馬！",
-      "把每一天都過得充實，才不會留下遺憾。",
-      "你的決心，將會為你開闢一條康莊大道。",
-      "不要讓別人的話影響你，相信自己就好。",
-      "你的努力，將會為你贏得掌聲。", 
-      "你是一個勇敢追夢的學測戰士！"
+      "撐過去，學測的勝利就是你的！", "現在的汗水，都是明天的分數！", "再堅持一下，頂大在向你招手！", 
+      "錯誤是成功的養分，訂正過後你更強了！", "每一次的連勝，都是實力的累積！", "今天多刷一題，考場上就少一分懊悔。",
+      "沒有奇蹟，只有不斷累積的軌跡。", "別人休息時你還在拚，這就是你贏的原因。", "痛苦是短暫的，但榜單上的名字是一輩子的。", 
+      "把不會的弄懂，你已經比昨天的自己更強！", "每一次的點擊，都是通往夢想校系的步伐。", "別怕錯題，那是考卷給你的溫柔提示。", 
+      "讀不完是正常的，但不讀是絕對不行的！", "累了就深呼吸，然後繼續拿下這一題。", "學測不是比誰聰明，是比誰有韌性。",
+      "黑馬不是天生的，是無數個夜晚熬出來的。", "你現在流的每一滴汗，都會變成考場上的底氣。", "不要去想結果，專注在眼前的這道題。", 
+      "連勝的火焰，象徵你燃燒的鬥志！", "答對了！將這份手感延續到學測當天。", "既然選擇了遠方，便只顧風雨兼程。", 
+      "每一科的破百，都是你實力的見證。", "那些看似不起波瀾的日復一日，會突然在某天讓人看到堅持的意義。", 
+      "你的極限，遠比你想像的還要遠。", "把筆握緊，把分數拿下！", "不要懷疑自己，你比你想像的更優秀。",
+      "現在的辛苦，是為了未來的自由。", "連勝中！保持這個節奏，無人能擋。", "學測這場馬拉松，撐到最後的才是贏家。",
+      "相信過程，結果自然會水到渠成。", "不要為昨天的錯題哭泣，要為今天的全對歡呼。", "你專注的樣子，是最耀眼的青春。", 
+      "所有的挫折，都是為了成就最後的榮耀。", "這題又拿下了！距離理想大學又近了一公尺。", "沒有所謂的運氣，只有準備好的實力。",
+      "別讓未來的你，討厭現在放棄的自己。", "學測戰士，今天也要火力全開！", "你不需要很厲害才能開始，但你需要開始才會很厲害。", 
+      "把每一次練習都當作正式上場。", "穩紮穩打，步步為營，這就是學霸的節奏。", "今天不走，明天就要用跑的。", 
+      "專注力是你的超能力，繼續保持！", "那些你熬過的夜，都會變成發光的星。", "不怕千萬人阻擋，只怕自己投降。", 
+      "成功沒有捷徑，只有刷不完的題。", "將來的你，一定會感謝現在拼命的自己。", "這題的觀念你已經完全掌握了，太棒了！", 
+      "學習就像爬山，越往上越累，但也越美。", "你流下的每一滴汗，都不會被辜負。", "現在多對一題，級分就多一級。",
+      "堅持下去，因為你值得更好的未來。", "你的努力，時間都看得見。", "不要害怕失敗，因為那是成功的必經之路。", 
+      "每一次的突破，都是對自己最好的交代。", "繼續保持這股氣勢，一鼓作氣衝上頂峰！", "學測只是一個關卡，而你已經具備過關的實力。", 
+      "把錯誤留在今天，把正確帶進考場。", "你的潛力無限，別被現在的成績設限。", "多一份堅持，就多一分勝算。", 
+      "加油！你離夢想只差最後一哩路。", "不管題目多難，你都能迎刃而解。", "你的大腦正在高速運轉，保持這個狀態！", 
+      "連勝的感覺很棒吧？記住這個成就感。", "不要被壓力擊倒，讓壓力成為你的動力。", "你就是自己命運的設計師。",
+      "把每一天都當作學測前一天來拚。", "你的毅力令人敬佩，繼續加油！", "只要不放棄，就永遠有希望。", 
+      "知識是你的武器，考場是你的戰場。", "帶著自信上陣，你一定能贏。", "每一次的練習，都在為你的夢想鋪路。",
+      "你的進步肉眼可見，繼續保持！", "不要跟別人比，跟昨天的自己比就好。", "就算疲憊，也要咬牙撐過去。", 
+      "你正在為自己的未來打下堅實的基礎。", "每一次的答對，都是對自己實力的肯定。", "把困難當作挑戰，把錯誤當作學習。", 
+      "你的專注度滿分，這就是成功的關鍵。", "不要讓任何事情阻礙你前進的腳步。", "你是一個充滿潛力的學測戰士！",
+      "把焦慮化為行動，把壓力化為實力。", "你的努力終將獲得回報。", "只要方向正確，就不怕路途遙遠。", 
+      "每一道錯題，都是你進步的階梯。", "你正在創造屬於自己的奇蹟。", "不要低估自己的能力，你比你想像的更強。", 
+      "把每一次的挫折，當作成長的養分。", "你的堅持，將會為你帶來豐碩的果實。", "繼續保持這份熱情，直到學測結束。", 
+      "你是一個不折不扣的學霸潛力股！", "把每一次的練習，都當作是一次蛻變。", "你的汗水，將會澆灌出美麗的花朵。", 
+      "不要畏懼挑戰，勇敢地迎上去吧！", "你的未來，由你自己掌握。", "你就是下一個學測黑馬！",
+      "把每一天都過得充實，才不會留下遺憾。", "你的決心，將會為你開闢一條康莊大道。", "不要讓別人的話影響你，相信自己就好。",
+      "你的努力，將會為你贏得掌聲。", "你是一個勇敢追夢的學測戰士！"
     ];
 
     let availableQuotes = [];
 
-    // 隨機獲取一句不重複的鼓勵語
     function getUniqueQuote() {
       if (availableQuotes.length === 0) {
-        // 如果用完了，重新洗牌補充
         availableQuotes = [...quotesPool];
         availableQuotes.sort(() => Math.random() - 0.5); 
       }
       return availableQuotes.pop();
     }
 
-    // ==========================================
-    // 3. 系統核心邏輯與狀態
-    // ==========================================
-    let currentSubject = '全部';
-    let filteredDB = [];
-    let currentQuestion = null;
-    let streak = 0;
-    
-    // 讀取錯題本
-    let wrongBook = JSON.parse(localStorage.getItem('labu_wrong_book')) || [];
-    let wrongBookFilterSubject = '全部';
-
+    // 3. 初始化與科目切換
     function init() {
-      updateStreakDisplay(); // 讓畫面顯示剛從 localStorage 抓到的數字
-      loadQuestion();
-      renderMath();
-      selectSubject('全部', document.querySelector('.subject-btn.active'));
+      updateStreakDisplay();
       document.getElementById('wrong-count').innerText = wrongBook.length;
+      // 預設選擇全科並載入題目
+      selectSubject('全部', document.querySelector('.subject-btn.active'));
     }
 
     function selectSubject(sub, btnElement) {
-      document.querySelectorAll('#view-quiz .subject-btn').forEach(btn => btn.classList.remove('active'));
-      if(btnElement) btnElement.classList.add('active');
-      
-    
-      updateStreak();
+      if (btnElement) {
+        document.querySelectorAll('#view-quiz .subject-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+      }
+
+      currentSubject = sub;
+
+      // 🌟 修正點：將 data.js 的資料過濾並載入到 filteredDB 裡面
+      const sourceData = (typeof database !== 'undefined') ? database : (window.database || []);
+      if (sub === '全部') {
+        filteredDB = sourceData;
+      } else {
+        filteredDB = sourceData.filter(q => q.subject === sub);
+      }
+
       loadQuestion();
     }
 
+    // 4. 題目載入與回答邏輯
     function loadQuestion() {
       startTimer();
       renderMath();
-      if(filteredDB.length === 0) return;
+
+      if (!filteredDB || filteredDB.length === 0) {
+        document.getElementById('q-badge').innerText = `💡 提示`;
+        document.getElementById('q-text').innerText = "此科目目前沒有題目！";
+        document.getElementById('q-options').innerHTML = '';
+        return;
+      }
+
       const randIndex = Math.floor(Math.random() * filteredDB.length);
       currentQuestion = filteredDB[randIndex];
 
@@ -508,91 +319,66 @@ function updateTimerDisplay() {
       document.getElementById('q-explanation').classList.add('hidden');
       document.getElementById('btn-next').classList.add('hidden');
     }
-function checkAnswer(selectedOption) {
-  stopTimer();
-  renderMath();
-  if (selectedOption === correctAnswer) {
-    // 答對了！連勝 +1
-    currentStreak++;
-    // 🌟 關鍵：立刻將新數字存入 localStorage
-    localStorage.setItem('winStreak', currentStreak); 
-    
-    // 呼叫函式更新畫面
-    updateStreakDisplay();
 
-    // ... (你原本答對的動畫或提示) ...
+    function checkAnswer(btn, selectedKey) {
+      stopTimer();
+      const options = document.querySelectorAll('.btn-option');
+      options.forEach(opt => opt.onclick = null); // 鎖定作答
 
-  } else {
-    // 答錯了！連勝慘遭中斷
-    currentStreak = 0;
-    // 🌟 關鍵：將歸零的紀錄存入 localStorage，這樣重整網頁也不會作弊恢復
-    localStorage.setItem('winStreak', currentStreak); 
-    
-    // 呼叫函式更新畫面
-    updateStreakDisplay();
+      const isCorrect = (selectedKey === currentQuestion.answer);
 
-    // ... (你原本答錯的邏輯，例如顯示解析、存入錯題本) ...
-  }
-  
-  // 記得要有我們上一部加的公式渲染喔！
-  renderMath();
-    }
-   function checkAnswer(btn, selectedKey) {
-    const options = document.querySelectorAll('.btn-option');
-    options.forEach(opt => opt.onclick = null); // 鎖定作答
-
-    const isCorrect = (selectedKey === currentQuestion.answer);
-
-    if (isCorrect) {
+      if (isCorrect) {
         btn.classList.add('correct');
-        
-        // ✅ 答對：使用 currentStreak 並存檔
         currentStreak++;
         localStorage.setItem('winStreak', currentStreak);
 
-        // 每 5 連勝觸發感性鼓勵
         if (currentStreak > 0 && currentStreak % 5 === 0) {
-            showRewardModal();
+          showRewardModal();
         }
-    } else {
+      } else {
         btn.classList.add('wrong');
         options.forEach(opt => {
-            if(opt.innerText.startsWith(currentQuestion.answer)) opt.classList.add('correct');
+          if (opt.innerText.startsWith(currentQuestion.answer)) opt.classList.add('correct');
         });
         
-        // ✅ 答錯：將 currentStreak 歸零並存檔防作弊
         currentStreak = 0;
         localStorage.setItem('winStreak', currentStreak);
-        
         addToWrongBook(currentQuestion);
-    }
+      }
 
-    // ✅ 呼叫更新畫面的函式 (統一使用 updateStreakDisplay)
-    updateStreakDisplay();
+      updateStreakDisplay();
 
-    const exp = document.getElementById('q-explanation');
-    exp.innerHTML = `<strong>解析：</strong> ${currentQuestion.explanation}`;
-    exp.classList.remove('hidden');
+      const exp = document.getElementById('q-explanation');
+      exp.innerHTML = `<strong>解析：</strong> ${currentQuestion.explanation}`;
+      exp.classList.remove('hidden');
 
-    document.getElementById('btn-next').classList.remove('hidden');
-    
-    // ✅ 確保顯示解析時，數學公式有被渲染
-    renderMath();
-}
-    function updateStreak() {
-      const badge = document.getElementById('streak-count');
-      badge.innerText = `🔥 連勝: ${currentStreak}`;
-      badge.classList.remove('pop');
-      void badge.offsetWidth; // trigger reflow
-      badge.classList.add('pop');
+      document.getElementById('btn-next').classList.remove('hidden');
+      renderMath();
     }
 
     function nextQuestion() {
       loadQuestion();
     }
 
+    // 5. 連勝與數學渲染工具
+    function updateStreakDisplay() {
+      const streakElement = document.getElementById('streak-count'); 
+      if (streakElement) {
+        streakElement.innerText = `🔥 連勝: ${currentStreak}`;
+      }
+    }
+
+    function renderMath() {
+      setTimeout(() => {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          MathJax.typesetClear();
+          MathJax.typesetPromise().catch((err) => console.log('MathJax error:', err));
+        }
+      }, 50);
+    }
+
     function showRewardModal() {
-      document.getElementById('reward-streak-num').innerText = streak;
+      document.getElementById('reward-streak-num').innerText = currentStreak;
       document.getElementById('reward-msg').innerText = getUniqueQuote();
       document.getElementById('reward-modal').classList.remove('hidden');
     }
@@ -601,16 +387,40 @@ function checkAnswer(selectedOption) {
       document.getElementById('reward-modal').classList.add('hidden');
     }
 
-    // ==========================================
-    // 4. 錯題本與自訂拍照上傳系統
-    // ==========================================
+    // 6. 計時器功能
+    function startTimer() {
+      stopTimer();
+      secondsElapsed = 0;
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const timerElement = document.getElementById('timer-text');
+      if (!timerElement) return;
+      const minutes = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+      const seconds = (secondsElapsed % 60).toString().padStart(2, '0');
+      timerElement.innerText = `${minutes}:${seconds}`;
+    }
+
+    // 7. 錯題本與自訂上傳
     function switchTab(tab) {
       document.getElementById('tab-quiz-btn').classList.remove('active');
       document.getElementById('tab-wrong-btn').classList.remove('active');
       document.getElementById('view-quiz').classList.add('hidden');
       document.getElementById('view-wrong').classList.add('hidden');
 
-      if(tab === 'quiz') {
+      if (tab === 'quiz') {
         document.getElementById('tab-quiz-btn').classList.add('active');
         document.getElementById('view-quiz').classList.remove('hidden');
       } else {
@@ -622,7 +432,7 @@ function checkAnswer(selectedOption) {
 
     function filterWrong(sub, btnElement) {
       document.querySelectorAll('#wrong-subject-grid .subject-btn').forEach(btn => btn.classList.remove('active'));
-      if(btnElement) btnElement.classList.add('active');
+      if (btnElement) btnElement.classList.add('active');
       wrongBookFilterSubject = sub;
       renderWrongBook();
     }
@@ -636,7 +446,7 @@ function checkAnswer(selectedOption) {
           question: qObj.question,
           answer: qObj.answer || '',
           explanation: qObj.explanation,
-          imgBase64: null // 系統題庫暫無圖片
+          imgBase64: null
         });
         saveWrongBook();
       }
@@ -677,7 +487,7 @@ function checkAnswer(selectedOption) {
     }
 
     function deleteWrong(id) {
-      if(confirm('確定要刪除這筆錯題嗎？')) {
+      if (confirm('確定要刪除這筆錯題嗎？')) {
         wrongBook = wrongBook.filter(w => w.id !== id);
         saveWrongBook();
         renderWrongBook();
@@ -688,9 +498,6 @@ function checkAnswer(selectedOption) {
       localStorage.setItem('labu_wrong_book', JSON.stringify(wrongBook));
       document.getElementById('wrong-count').innerText = wrongBook.length;
     }
-
-    // 自訂/拍照彈窗邏輯
-    let currentImageBase64 = null;
 
     function openAddModal() {
       document.getElementById('custom-question').value = '';
@@ -745,13 +552,10 @@ function checkAnswer(selectedOption) {
 
       saveWrongBook();
       closeAddModal();
-      
-      // 如果目前正在錯題本頁面，則重新渲染並跳至該科目
-     filterWrong(subj, document.querySelector(`#wrong-subject-grid .subject-btn:nth-child(${['全部','物理','化學','生物','地球科學'].indexOf(subj)+1})`));
       alert("錯題已成功儲存！");
     }
 
-    // 啟動應用程式
+    // 8. 啟動應用程式
     window.onload = init;
   </script>
 </body>
