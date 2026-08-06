@@ -200,6 +200,16 @@
   </div>
  <script src="data.js"></script>
  <script>
+   // 從 localStorage 抓取連勝紀錄，如果沒有紀錄（第一次玩），就預設為 0
+let currentStreak = parseInt(localStorage.getItem('winStreak')) || 0;
+   // 更新畫面上連勝數字的函式
+function updateStreakDisplay() {
+  // 請確認 'streak-text' 是你 HTML 裡面顯示連勝數字的 ID
+  const streakElement = document.getElementById('streak-text'); 
+  if (streakElement) {
+    streakElement.innerText = currentStreak;
+  }
+}
 function renderMath() {
   // 讓程式稍微等 50 毫秒，確保 HTML 已經把題目文字確實印在畫面上
   setTimeout(() => {
@@ -501,6 +511,31 @@ function updateTimerDisplay() {
     }
 function checkAnswer(selectedOption) {
   stopTimer();
+  renderMath();
+  if (selectedOption === correctAnswer) {
+    // 答對了！連勝 +1
+    currentStreak++;
+    // 🌟 關鍵：立刻將新數字存入 localStorage
+    localStorage.setItem('winStreak', currentStreak); 
+    
+    // 呼叫函式更新畫面
+    updateStreakDisplay();
+
+    // ... (你原本答對的動畫或提示) ...
+
+  } else {
+    // 答錯了！連勝慘遭中斷
+    currentStreak = 0;
+    // 🌟 關鍵：將歸零的紀錄存入 localStorage，這樣重整網頁也不會作弊恢復
+    localStorage.setItem('winStreak', currentStreak); 
+    
+    // 呼叫函式更新畫面
+    updateStreakDisplay();
+
+    // ... (你原本答錯的邏輯，例如顯示解析、存入錯題本) ...
+  }
+  
+  // 記得要有我們上一部加的公式渲染喔！
   renderMath();
     }
     function checkAnswer(btn, selectedKey) {
