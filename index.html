@@ -537,38 +537,48 @@ function checkAnswer(selectedOption) {
   // 記得要有我們上一部加的公式渲染喔！
   renderMath();
     }
-    function checkAnswer(btn, selectedKey) {
-      const options = document.querySelectorAll('.btn-option');
-      options.forEach(opt => opt.onclick = null); // 鎖定作答
+   function checkAnswer(btn, selectedKey) {
+    const options = document.querySelectorAll('.btn-option');
+    options.forEach(opt => opt.onclick = null); // 鎖定作答
 
-      const isCorrect = (selectedKey === currentQuestion.answer);
+    const isCorrect = (selectedKey === currentQuestion.answer);
 
-      if (isCorrect) {
+    if (isCorrect) {
         btn.classList.add('correct');
-        streak++;
         
+        // ✅ 答對：使用 currentStreak 並存檔
+        currentStreak++;
+        localStorage.setItem('winStreak', currentStreak);
+
         // 每 5 連勝觸發感性鼓勵
-        if (streak > 0 && streak % 5 === 0) {
-          showRewardModal();
+        if (currentStreak > 0 && currentStreak % 5 === 0) {
+            showRewardModal();
         }
-      } else {
+    } else {
         btn.classList.add('wrong');
         options.forEach(opt => {
-          if(opt.innerText.startsWith(currentQuestion.answer)) opt.classList.add('correct');
+            if(opt.innerText.startsWith(currentQuestion.answer)) opt.classList.add('correct');
         });
-        streak = 0;
+        
+        // ✅ 答錯：將 currentStreak 歸零並存檔防作弊
+        currentStreak = 0;
+        localStorage.setItem('winStreak', currentStreak);
+        
         addToWrongBook(currentQuestion);
-      }
-
-      updateStreak();
-
-      const exp = document.getElementById('q-explanation');
-      exp.innerHTML = `<strong>解析：</strong> ${currentQuestion.explanation}`;
-      exp.classList.remove('hidden');
-      
-      document.getElementById('btn-next').classList.remove('hidden');
     }
 
+    // ✅ 呼叫更新畫面的函式 (統一使用 updateStreakDisplay)
+    updateStreakDisplay();
+
+    const exp = document.getElementById('q-explanation');
+    exp.innerHTML = `<strong>解析：</strong> ${currentQuestion.explanation}`;
+    exp.classList.remove('hidden');
+
+    document.getElementById('btn-next').classList.remove('hidden');
+    
+    // ✅ 確保顯示解析時，數學公式有被渲染
+    renderMath();
+}
     function updateStreak() {
       const badge = document.getElementById('streak-count');
       badge.innerText = `🔥 連勝: ${streak}`;
