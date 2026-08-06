@@ -479,10 +479,7 @@ function updateTimerDisplay() {
       document.querySelectorAll('#view-quiz .subject-btn').forEach(btn => btn.classList.remove('active'));
       if(btnElement) btnElement.classList.add('active');
       
-      currentSubject = sub;
-      filteredDB = sub === '全部' ? [...database] : database.filter(q => q.subject === sub);
-      
-      streak = 0;
+    
       updateStreak();
       loadQuestion();
     }
