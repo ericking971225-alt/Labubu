@@ -581,7 +581,7 @@ function checkAnswer(selectedOption) {
 }
     function updateStreak() {
       const badge = document.getElementById('streak-count');
-      badge.innerText = `🔥 連勝: ${streak}`;
+      badge.innerText = `🔥 連勝: ${currentStreak}`;
       badge.classList.remove('pop');
       void badge.offsetWidth; // trigger reflow
       badge.classList.add('pop');
