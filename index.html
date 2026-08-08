@@ -444,6 +444,7 @@
           id: Date.now(),
           subject: qObj.subject,
           question: qObj.question,
+          options: qObj.options || null,
           answer: qObj.answer || '',
           explanation: qObj.explanation,
           imgBase64: null
@@ -452,7 +453,7 @@
       }
     }
 
-    function renderWrongBook() {
+function renderWrongBook() {
       renderMath();
       const container = document.getElementById('wrong-list-container');
       container.innerHTML = '';
@@ -470,12 +471,30 @@
       }
 
       filtered.forEach(item => {
+        // 🌟 新增邏輯：把選項組合起來，並且將正確答案標示為綠色
+        let optionsHTML = '';
+        if (item.options) {
+          optionsHTML = `<div style="margin: 12px 0; padding: 12px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">`;
+          for (const [key, val] of Object.entries(item.options)) {
+            const isCorrect = (key === item.answer);
+            const style = isCorrect 
+              ? `color: #059669; font-weight: 800; background: #d1fae5; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px;` 
+              : `color: #475569; font-weight: 500; padding: 4px 8px; display: inline-block; margin-bottom: 6px;`;
+            
+            optionsHTML += `<div style="${style}">${key}. ${val}</div><br>`;
+          }
+          optionsHTML += `</div>`;
+        }
+
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
           <button class="btn-delete" onclick="deleteWrong(${item.id})">刪除</button>
           <div class="subject-badge">💡 ${item.subject}</div>
           <div class="question-text">${item.question || '(圖片題)'}</div>
+          
+          ${optionsHTML} <!-- 🌟 顯示選項區塊 -->
+          
           ${item.imgBase64 ? `<img src="${item.imgBase64}" class="wrong-img" alt="題目圖片">` : ''}
           <div class="explanation" style="margin-top: 15px;">
             ${item.answer ? `<strong>正確答案：</strong> ${item.answer}<br>` : ''}
