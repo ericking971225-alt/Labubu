@@ -482,11 +482,11 @@ function renderWrongBook() {
             if (isCorrect) {
               // 正確答案：綠色底 + 勾勾
               style = `color: #059669; font-weight: 800; background: #d1fae5; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px; border: 1px solid #10b981;`;
-              icon = ' ✅';
+              icon = ' ';
             } else if (isUserWrong) {
               // 使用者選錯的：紅色底 + 刪除線 + 叉叉
               style = `color: #dc2626; font-weight: 800; background: #fee2e2; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px; border: 1px solid #ef4444; text-decoration: line-through;`;
-              icon = ' ❌ (你的作答)';
+              icon = '  (你的作答)';
             }
             
             optionsHTML += `<div style="${style}">${key}. ${val}${icon}</div><br>`;
