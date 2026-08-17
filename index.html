@@ -193,7 +193,6 @@
         <label>正確答案與觀念解析</label>
         <textarea id="custom-explanation" class="input-control" rows="3" placeholder="輸入正確答案與詳細觀念..."></textarea>
       </div>
-      <button id="save-btn" onclick="saveCustomWrong()" class="...">儲存錯題</button>
       <button class="btn-action" onclick="saveCustomWrong()">儲存至錯題本 💾</button>
       <button class="btn-action" style="background: #e2e8f0; color: #64748b; margin-top: 8px;" onclick="closeAddModal()">取消</button>
     </div>
@@ -434,7 +433,7 @@
       renderWrongBook();
     }
 
-    function addToWrongBook(qObj) {
+    function addToWrongBook(qObj, userAnswer) {
       const exists = wrongBook.find(w => w.question === qObj.question);
       if (!exists) {
         wrongBook.unshift({
